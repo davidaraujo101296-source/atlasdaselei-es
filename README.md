@@ -104,6 +104,33 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 
 **Ainda dependem de consulta externa pelo navegador:** governador, senador e deputados (2022 e 2026) e prefeito e vereador (2024). Esses cargos não foram migrados. Os arquivos JSON de divulgação de 2022 no `resultados.tse.jus.br` respondem 404 desde a verificação de 23/10/2026; para governador e senador de 2022, o site usa o CSV compilado pelo NOPolitica.
 
+## Transmissão automática (OBS + YouTube)
+
+`transmissao.html` é uma tela de 1920x1080 para o OBS. Ela alterna sozinha entre a visão nacional, um estado em destaque e as novas parciais. Os dados vêm **sempre** das APIs públicas da Vercel (`/api/apuracao?cargo=presidente&uf=BR` e `/api/mapa`), nas URLs canônicas, mesmo com a página aberta em `127.0.0.1`. Ela não consulta o TSE diretamente.
+
+**Configurar o OBS (Windows):**
+
+1. Abra a página por um destes caminhos:
+   - servidor local: `npm run dev` e mantenha o terminal aberto durante toda a live; a URL é `http://127.0.0.1:3000/transmissao.html`;
+   - depois do merge na `main`: `https://atlasdaselei-es.vercel.app/transmissao.html`, sem servidor local.
+2. Em **Configurações → Vídeo**, use resolução base e de saída **1920x1080** e **30 FPS**.
+3. Adicione uma fonte **Navegador** com essa URL, largura **1920**, altura **1080** e FPS personalizado **30**. Deixe **desmarcados** "Desligar fonte quando não estiver visível" e "Atualizar navegador quando a cena se tornar ativa".
+4. Em **Configurações → Transmissão**, escolha o serviço YouTube com a chave da live. Para 1080p30, use de 4.500 a 9.000 kbps.
+5. Silencie o microfone no mixer: a transmissão é só visual.
+6. Antes da live, teste com `?demo=1`, que mostra "DEMONSTRAÇÃO — DADOS FICTÍCIOS". **Nunca transmita com `?demo=1`.**
+7. Se a página travar, clique com o botão direito na fonte → **Atualizar**. O último resultado válido volta na hora, marcado como recuperado.
+
+**Tempos de cena** (opcionais, em segundos): `transmissao.html?nacional=20&estado=15&parcial=15`.
+
+**Comportamento:**
+- **Antes das 17h:** "Aguardando divulgação oficial", com contagem regressiva e sem números.
+- **Com votos:** a visão nacional dura ~20 s e o estado em destaque ~15 s, com aproximação suave no mapa.
+- **Nova parcial:** só conta quando as seções ou os votos oficiais de uma UF avançam. Não conta uma nova consulta do mesmo arquivo, `fetchedAt` diferente, resposta `stale` ou resposta antiga vinda do CDN. A parcial entra depois da cena atual, numa fila limitada, sem repetir a mesma UF antes de 4 minutos e alternando regiões.
+- **Em falha:** a tela mantém o último resultado válido, com o aviso "Dados desatualizados", e volta sozinha quando a consulta seguinte funciona.
+- **Indicador AO VIVO:** só pisca com a apuração oficial em andamento e com dados atualizados.
+
+O mapa vem da malha oficial do IBGE e é gerado com `node scripts/transmissao/gerar-mapa.cjs`. O teste de tela em 1920x1080 está em `tests/e2e/transmissao.e2e.cjs` e usa Playwright e Chrome; ele não faz parte do `npm test`.
+
 ## Documentação oficial
 
 - [TSE: Informações técnicas para divulgação 2026](https://www.tse.jus.br/eleicoes/informacoes-tecnicas-sobre-a-divulgacao-de-resultados)
