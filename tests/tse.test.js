@@ -18,6 +18,7 @@ function sample({uf='BR',cargo='presidente',votes=0,counted=0}={}){
     van:String(votes?100:0),vb:String(votes?10:0),tvn:String(votes?30:0),vn:String(votes?25:0),vnt:String(votes?5:0)}
  };
 }
+test.beforeEach(()=>core.resetForTests());
 function response(){return{statusCode:200,headers:{},setHeader(k,v){this.headers[k]=v},end(x){this.data=JSON.parse(x)}}}
 test('URLs oficiais do TSE para segundo turno',()=>{
  assert.equal(core.urlFor('presidente','BR'),'https://resultados.tse.jus.br/oficial/ele2026/6258/dados/br/br-c0001-e006258-u.json');
@@ -90,4 +91,25 @@ test('Mapa consulta 27 UFs após totalização começar, com fonte TSE',async()=
 test('EA20 sem campo vv não pode ser exibido como resultado válido',()=>{
  const data=sample({votes:5000});delete data.v.vv;
  assert.throws(()=>core.normalize(data,'presidente','BR','source'),/EA20 incompleta/);
+});
+
+test('brancos e nulos separados usam os percentuais oficiais do TSE sobre votos totais',()=>{
+ const data=sample({votes:10000,counted:250000});
+ Object.assign(data.v,{pvv:'98,74',pvb:'0,09',ptvn:'0,27'});
+ const r=core.normalize(data,'presidente','BR','source');
+ assert.equal(r.votes.blank,10);assert.equal(r.votes.null,30);assert.equal(r.votes.total,11140);
+ assert.equal(r.votes.blankPercentage,0.09);assert.equal(r.votes.nullPercentage,0.27);assert.equal(r.votes.validPercentage,98.74);
+ // Percentual do candidato continua relativo aos votos válidos (pvap do TSE).
+ assert.equal(r.candidates[0].percentage,90.91);
+});
+test('sem percentual oficial, brancos e nulos são calculados sobre votos totais, não válidos',()=>{
+ const v=core.voteSummary({tv:'1000',vv:'920',vb:'30',tvn:'50'});
+ assert.equal(v.blankPercentage,3);assert.equal(v.nullPercentage,5);assert.equal(v.validPercentage,92);
+ assert.notEqual(v.blankPercentage,Math.round(30/920*10000)/100);
+});
+test('sem votos totais não há percentual inventado para brancos e nulos',()=>{
+ const v=core.voteSummary({tv:'0',vv:'0',vb:'0',tvn:'0'});
+ assert.equal(v.blankPercentage,null);assert.equal(v.nullPercentage,null);
+ const w=core.awaiting('presidente','BR').votes;
+ assert.equal(w.blankPercentage,null);assert.equal(w.nullPercentage,null);
 });
