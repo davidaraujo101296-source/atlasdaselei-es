@@ -13,6 +13,33 @@ Site independente para acompanhar a **apuração oficial do 2º turno, em 25/10/
 - `tests/tse.test.js` — testes locais, executáveis com `npm test`.
 - `vercel.json` — configuração de limites de execução.
 
+## Revisar no computador (sem publicação)
+
+Com Node.js 20 ou mais novo, abra um terminal na pasta do projeto:
+
+```bash
+npm test
+npm run dev
+```
+
+Não é necessário instalar dependências. Abra **http://127.0.0.1:3000** para o
+Atlas Histórico, **http://127.0.0.1:3000/atlas.html** para a rota alternativa e
+**http://127.0.0.1:3000/ao-vivo.html** para a apuração. O servidor local reutiliza
+os handlers de `api/`, incluindo as consultas ao TSE e as regras de pré-apuração.
+Ele escuta apenas no próprio computador e não publica nem altera o projeto remoto.
+Encerre com `Ctrl+C`. Se a porta estiver ocupada, use no PowerShell:
+`$env:PORT=3001; npm run dev`.
+
+Para revisar barras e resultados preenchidos, abra
+**http://127.0.0.1:3000/ao-vivo.html?demo=1**. Esse modo mostra votos fictícios,
+com aviso explícito de demonstração. Mapas geográficos e consultas oficiais
+precisam de internet. A indisponibilidade de uma fonte não deve ser interpretada
+como resultado eleitoral.
+
+A identidade das três páginas está centralizada em `styles.css`. Os arquivos
+`index.html` e `atlas.html` devem permanecer sincronizados. As cores dos candidatos
+e partidos são independentes das cores de navegação.
+
 ## Como publicar (GitHub + Vercel)
 
 1. Extraia o arquivo ZIP. Suba **o conteúdo completo da pasta**, não apenas o HTML, a um repositório GitHub.
@@ -22,7 +49,7 @@ Site independente para acompanhar a **apuração oficial do 2º turno, em 25/10/
 5. Teste primeiro `https://SEU-ENDERECO.vercel.app/api/apuracao?cargo=presidente&uf=BR` e depois o histórico `https://SEU-ENDERECO.vercel.app/` e o ao vivo `https://SEU-ENDERECO.vercel.app/ao-vivo.html`.
 6. Para conferir o layout com números **fictícios e claramente identificados**, use `https://SEU-ENDERECO.vercel.app/ao-vivo.html?demo=1`. Nunca confunda esse modo com a apuração oficial.
 
-**Importante:** abrir `ao-vivo.html` diretamente no computador ativa o **modo demonstração**. Os dados oficiais só aparecem com as funções de servidor implantadas na Vercel. Um hosting puramente estático (GitHub Pages, por exemplo) **não executa** a pasta `api/`.
+**Importante:** use `npm run dev` para revisar o site localmente com estilos, links e API. Abrir `ao-vivo.html` diretamente como arquivo ativa o **modo demonstração**; a API requer o servidor local ou funções de servidor na hospedagem. Um hosting puramente estático (GitHub Pages, por exemplo) **não executa** a pasta `api/`.
 
 ## Funcionamento
 
