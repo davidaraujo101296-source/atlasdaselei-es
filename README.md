@@ -1,11 +1,12 @@
-# Atlas Eleitoral — Apuração 2026 ao vivo
+# Atlas Eleitoral — Histórico + Apuração ao Vivo
 
 Site independente para acompanhar a **apuração oficial do 2º turno, em 25/10/2026**, com dados publicados pelo TSE. Projeto simples, **sem banco de dados, sem chaves e sem bibliotecas externas para a API**, preparado para conectar a um repositório GitHub e publicar na **Vercel**.
 
 ## Conteúdo do pacote
 
-- `index.html` — painel da apuração (presidente nacional/UF e governador nos estados com segundo turno).
-- `atlas.html` — versão histórica anterior do Atlas (2018, 2022, 2024, 2026).
+- `index.html` — página inicial com resultados históricos (2018, 2022, 2024 e 2026), mapa e comparação nacional/estadual.
+- `atlas.html` — rota histórica alternativa que mantém links antigos funcionando.
+- `ao-vivo.html` — painel da apuração ao vivo (presidente nacional/UF e governador nos estados com segundo turno).
 - `api/apuracao.js` — consulta por cargo e abrangência no TSE, usando função Node da Vercel.
 - `api/mapa.js` — consolida a situação da apuração presidencial nas 27 unidades da Federação, com concorrência limitada.
 - `lib/tse.js` — validação, endereços oficiais e leitura do JSON EA20.
@@ -18,10 +19,10 @@ Site independente para acompanhar a **apuração oficial do 2º turno, em 25/10/
 2. Abra [vercel.com/new](https://vercel.com/new), importe o repositório e selecione **Other** (sem framework).
 3. Deixe o diretório raiz na pasta onde estão `index.html`, `api`, `lib` e `vercel.json`. Se o repositório contiver a pasta `atlas-eleitoral-ao-vivo` dentro dele, selecione essa pasta como **Root Directory**.
 4. Não é necessário `npm install`, build, banco de dados nem variáveis de ambiente. Publique com **Deploy**.
-5. Teste primeiro `https://SEU-ENDERECO.vercel.app/api/apuracao?cargo=presidente&uf=BR` e depois a página principal `https://SEU-ENDERECO.vercel.app/`.
-6. Para conferir o layout com números **fictícios e claramente identificados**, use `https://SEU-ENDERECO.vercel.app/?demo=1`. Nunca confunda esse modo com a apuração oficial.
+5. Teste primeiro `https://SEU-ENDERECO.vercel.app/api/apuracao?cargo=presidente&uf=BR` e depois o histórico `https://SEU-ENDERECO.vercel.app/` e o ao vivo `https://SEU-ENDERECO.vercel.app/ao-vivo.html`.
+6. Para conferir o layout com números **fictícios e claramente identificados**, use `https://SEU-ENDERECO.vercel.app/ao-vivo.html?demo=1`. Nunca confunda esse modo com a apuração oficial.
 
-**Importante:** abrir `index.html` diretamente no computador ativa o **modo demonstração**. Os dados oficiais só aparecem com as funções de servidor implantadas na Vercel. Um hosting puramente estático (GitHub Pages, por exemplo) **não executa** a pasta `api/`.
+**Importante:** abrir `ao-vivo.html` diretamente no computador ativa o **modo demonstração**. Os dados oficiais só aparecem com as funções de servidor implantadas na Vercel. Um hosting puramente estático (GitHub Pages, por exemplo) **não executa** a pasta `api/`.
 
 ## Funcionamento
 
