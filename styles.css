@@ -273,3 +273,269 @@ input[type=checkbox] { accent-color: var(--green); width: 17px; height: 17px; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Composição editorial: introdução, mapa e resultados na mesma primeira tela. */
+:root { --live-red: #D71920; }
+body { font-family: "Segoe UI", system-ui, sans-serif; }
+.wrap, .container { max-width: 1540px; padding-left: 36px; padding-right: 36px; }
+.top, .nav { min-height: 80px; gap: 24px; padding-top: 0; padding-bottom: 0; }
+.top { margin-bottom: 0; }
+.brand { color: var(--ink); flex-shrink: 0; gap: 10px; }
+.brand:hover { text-decoration: none; }
+.brazil-mark { width: 46px; height: 46px; flex-shrink: 0; }
+.brand strong { display: block; font-size: 23px; font-weight: 800; letter-spacing: -.055em; line-height: 1.2; }
+.brand span { display: block; color: var(--muted); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; margin-top: 3px; }
+.portal-nav { display: flex; align-items: center; gap: 28px; height: 80px; }
+.portal-nav a { position: relative; color: var(--ink); font-size: 12px; padding: 28px 0; }
+.portal-nav .current { font-weight: 700; }
+.portal-nav .current::after { content: ""; position: absolute; bottom: 18px; left: 0; width: 28px; height: 3px; border-radius: 2px; background: var(--gold); }
+.live-nav { min-height: 44px; padding: 10px 18px; background: var(--live-red); color: white; border-radius: 8px; font-size: 13px; font-weight: 700; gap: 10px; }
+.live-nav:hover { background: #b81016; }
+.live-dot { background: #ff666b; width: 8px; height: 8px; box-shadow: 0 0 0 4px #ffffff20; }
+.live-nav[data-live-state="counting"] .live-dot { background: #fff; animation: rec-pulse 1.8s ease-in-out infinite; }
+.live-nav[data-live-state="final"] { background: var(--green); }
+.live-nav[data-live-state="waiting"] .live-dot, .live-nav[data-live-state="unavailable"] .live-dot { box-shadow: none; }
+.live-current { cursor: default; }
+@keyframes rec-pulse { 50% { box-shadow: 0 0 0 6px #ffffff38; } }
+.main { padding-top: 0; }
+.filters, .switcher { background: transparent; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; margin: 0; padding: 14px 0; box-shadow: none; }
+.filters { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.filterrow { gap: 14px; }
+.filterrow + .filterrow { margin: 0; padding: 0; border: 0; flex: 1; }
+.funit { gap: 7px; }
+.flabel { font-size: 9px; letter-spacing: .07em; }
+.segments { padding: 3px; border: 1px solid #dbe3d6; background: #edf1e8; }
+.seg { padding: 7px 10px; min-height: 34px; font-size: 11px; }
+.office-scroll { gap: 4px; flex-wrap: wrap; }
+.office { padding: 7px 8px; font-size: 10px; min-height: 36px; border-color: transparent; background: transparent; }
+.office.active { background: #e4ecdf; box-shadow: none; border-color: #afc4b4; }
+.filterhint { display: none; }
+.filterrow:first-child { flex-wrap: nowrap; }
+.election-stage { position: relative; display: grid; grid-template-columns: minmax(210px,.76fr) minmax(370px,1.5fr) minmax(350px,1.1fr); gap: 22px; align-items: start; padding: 28px 0 42px; isolation: isolate; }
+.election-stage > :not(.brasil-landscape) { z-index: 1; min-width: 0; }
+.election-stage .hero { padding-top: 40px; display: block; }
+.hero .eyebrow { font-size: 9px; letter-spacing: .19em; }
+.hero .eyebrow::before { display: none; }
+.hero h1 { font-size: clamp(35px,2.9vw,46px); font-weight: 800; line-height: 1.08; letter-spacing: -.06em; margin: 18px 0; }
+.hero h1 em { display: inline; color: var(--green); text-decoration: none; font-style: normal; }
+.hero p { max-width: 280px; color: #526760; font-size: 14px; line-height: 1.65; }
+.intro-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 45px; border-top: 1px solid #ccd9cb; padding-top: 16px; color: var(--muted); font-size: 11px; }
+.intro-arrow { font-size: 28px; color: var(--green); }
+.brasil-landscape { position: absolute; bottom: 0; left: -36px; width: calc(100% + 72px); height: 165px; z-index: 0; pointer-events: none; opacity: .8; }
+.election-stage .map-panel, .election-stage .map-box { border: 0; border-radius: 0; padding: 0; background: transparent; overflow: visible; }
+.map { height: 550px; margin: 0 -8px; }
+.secrow h3, .panel-head h2 { font-size: 15px; }
+.map-panel > .secrow, .map-box > .panel-head { align-items: center; }
+.map-panel .tag, .map-box .tag { display: none; }
+.map-panel .secrow p, .map-box .panel-head p { font-size: 11px; }
+.national-action { text-align: right; }
+#go-national { width: auto; margin: 8px 0 0; padding: 4px 9px; min-height: 30px; font-size: 10px; background: transparent; border-color: #b4c6b3; }
+.under-map, .map-footer { margin: 0; padding-top: 10px; border-color: #c4d2bd; }
+.legend { font-size: 10px; gap: 8px 12px; }
+.map-footnote, .map-panel .fineprint { font-size: 10px; margin: 7px 0; }
+.election-stage .side { gap: 12px; }
+.detail, .score { background: #fffefaed; padding: 22px; border-top: 1px solid #d9e2d5; border-radius: 14px; box-shadow: 0 8px 30px #142f3505; }
+.detail #candidate-list { max-height: 355px; overflow-y: auto; padding-right: 6px; scrollbar-color: #a4bba5 #edf2e9; scrollbar-width: thin; }
+.detail h3, .score h2 { font-size: 27px; margin: 10px 0 6px; font-weight: 800; }
+.detail h3::before, .score h2::before { content: "◈"; color: var(--green); display: inline-block; margin-right: 10px; font-size: 24px; vertical-align: 1px; }
+.overline, .score .eyebrow { font-size: 9px; letter-spacing: .12em; }
+.status { padding: 4px 7px; font-size: 10px; margin-top: 10px; }
+.candidate-toolbar { margin-top: 10px; }
+.candidate-toolbar input[type=text] { min-height: 34px; font-size: 11px; padding: 7px 10px; }
+.vote, .candidate { padding: 12px 0; }
+.num { font-size: 22px; }
+.vn, .cand-name { font-size: 13px; }
+.dot, .swatch { width: 10px; height: 10px; border-radius: 50%; }
+.vmeta, .cand-party, .cand-score small { font-size: 10px; }
+.pager { margin-top: 10px; }
+.pager .smallbtn { min-height: 30px; padding: 2px 9px; }
+.helper, .detail .micro { font-size: 10px; }
+.metrics { margin: 20px 0; background: transparent; border-left: 0; border-right: 0; border-radius: 0; }
+.metric { padding: 14px 22px; }
+.metric strong { font-size: 23px; }
+.below-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 18px; align-items: start; }
+.below-grid .overview { margin: 0; }
+.below-grid .note { margin: 0; padding: 18px 22px; }
+.below-grid .overview:not([hidden]) + .note { margin-top: 16px; }
+.explore { padding: 20px; }
+.state-list { grid-template-columns: repeat(6,minmax(0,1fr)); max-height: none; }
+.statebtn { font-size: 11px; }
+.live-page .switcher { padding: 12px 0; }
+.tabs { padding: 3px; }
+.tab { padding: 7px 16px; min-height: 36px; }
+.chooser select { padding: 7px 12px; min-height: 38px; }
+.live-stage .hero { padding-top: 35px; }
+.live-stage .hero h1 { font-size: clamp(39px,3.9vw,58px); }
+.right-hero { margin-top: 18px; justify-content: flex-start; gap: 6px; }
+.badge { font-size: 10px; }
+.alert { font-size: 11px; padding: 12px; margin: 18px 0 0; border-left-width: 3px; line-height: 1.6; }
+.live-stage .map { height: 580px; }
+.stats { grid-template-columns: repeat(2,minmax(0,1fr)); margin: 0; background: #fffefaed; border-radius: 12px; }
+.stat { padding: 10px 14px; }
+.stat strong { font-size: 21px; margin: 4px 0 1px; }
+.stat small { font-size: 8px; }
+.stat span { font-size: 10px; }
+.stat:nth-child(3) { border-left: 0; }
+.stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+.progress-wrap { margin-top: 16px; padding: 12px; }
+.progress-foot { font-size: 9px; }
+.meta-line { border-bottom: 1px solid var(--line); padding-bottom: 16px; margin: 16px 0 20px; }
+.live-lower { display: grid; grid-template-columns: minmax(0,2.2fr) minmax(260px,1fr); gap: 22px; align-items: start; }
+.live-lower .states { margin: 0; }
+.live-lower .source { border-top: 3px solid var(--gold); }
+.state-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.nav-links .archive { border: 0; background: none; box-shadow: inset 0 -3px var(--gold); border-radius: 0; }
+@media (min-width: 1600px) { .map { height: 600px; } }
+@media (max-width: 1190px) and (min-width: 801px) {
+  .wrap, .container { padding-left: 24px; padding-right: 24px; }
+  .portal-nav { gap: 16px; }
+  .election-stage { grid-template-columns: minmax(0,1.4fr) minmax(300px,1fr); gap: 20px; }
+  .election-stage .hero { grid-column: 1/-1; padding: 0; }
+  .election-stage .hero h1 { font-size: 32px; margin: 6px 0; }
+  .election-stage .hero h1 br { display: none; }
+  .election-stage .hero p { max-width: none; font-size: 12px; }
+  .intro-foot { display: none; }
+  .live-stage .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .live-stage .hero .alert { margin: 0; }
+  .map, .live-stage .map { height: 490px; }
+  .filterrow + .filterrow { flex-basis: 100%; }
+  .brasil-landscape { left: -24px; width: calc(100% + 48px); }
+}
+@media (max-width: 800px) {
+  .wrap, .container { padding-left: 16px; padding-right: 16px; }
+  .top, .nav { min-height: 68px; gap: 10px; flex-wrap: nowrap; padding: 10px 0; }
+  .brand strong { font-size: 18px; }
+  .brand span { font-size: 7px; letter-spacing: .09em; }
+  .brazil-mark { width: 34px; height: 34px; }
+  .brand { gap: 5px; }
+  .portal-nav { display: none; }
+  .nav .nav-links { display: flex; width: auto; }
+  .nav .nav-links a:not(.archive), .nav .live-current { display: none; }
+  .nav .nav-links .archive { padding: 8px 0; font-size: 11px; }
+  .header .container.nav { padding-left: 16px; padding-right: 16px; }
+  .live-nav { width: auto; min-height: 40px; font-size: 11px; gap: 7px; padding: 8px 10px; white-space: nowrap; }
+  .live-nav > span:last-child:not(.live-dot) { display: none; }
+  .live-dot { width: 6px; height: 6px; }
+  .filters { padding: 10px 0; gap: 8px; }
+  .filterrow, .filterrow:first-child { width: 100%; gap: 8px; flex-wrap: nowrap; }
+  .funit { width: auto; gap: 3px; display: block; }
+  .flabel { width: auto; display: block; font-size: 8px; margin-bottom: 4px; }
+  .segments { display: flex; width: auto; padding: 2px; }
+  .seg { min-height: 36px; font-size: 10px; padding: 6px 8px; }
+  .filterrow + .filterrow { align-items: center; flex-wrap: nowrap; }
+  .filterrow + .filterrow > .flabel { display: none; }
+  .office-scroll { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; gap: 3px; }
+  .office { flex: 0 0 auto; min-height: 40px; padding: 7px 10px; font-size: 10px; }
+  .election-stage { display: flex; flex-direction: column; gap: 18px; padding: 18px 0 26px; }
+  .election-stage > :not(.brasil-landscape) { width: 100%; }
+  .election-stage .hero { padding: 0; }
+  .hero h1, .live-stage .hero h1 { font-size: 31px; line-height: 1.08; margin: 8px 0; letter-spacing: -.055em; }
+  .hero h1 br, .live-stage .hero h1 br { display: none; }
+  .hero .eyebrow { font-size: 8px; letter-spacing: .12em; }
+  .hero p { max-width: none; font-size: 12px; line-height: 1.5; }
+  .intro-foot { display: none; }
+  .map-panel > .secrow, .map-box > .panel-head { display: block; }
+  .map-panel .secrow p, .map-box .panel-head p { font-size: 10px; }
+  .map, .live-stage .map { height: 340px; margin: 0; }
+  .national-action { position: absolute; right: 0; margin-top: -35px; }
+  #go-national { max-width: 130px; text-align: center; font-size: 0; padding: 5px 10px; min-height: 32px; margin: 0; }
+  #go-national::after { content: "◎ Brasil inteiro"; font-size: 10px; }
+  .map-panel .secrow { padding-right: 133px; }
+  .side { display: flex; }
+  .detail, .score { padding: 18px; }
+  .detail #candidate-list { max-height: none; overflow: visible; padding: 0; }
+  .detail h3, .score h2 { font-size: 27px; }
+  .vote, .candidate { padding: 14px 0; }
+  .vn, .cand-name { font-size: 14px; }
+  .vmeta, .cand-party { font-size: 11px; }
+  .candidate-toolbar input[type=text] { min-height: 42px; font-size: 12px; }
+  .brasil-landscape { left: -16px; width: calc(100% + 32px); bottom: auto; top: 420px; height: 130px; opacity: .35; }
+  .live-stage .brasil-landscape { top: 480px; }
+  .metrics { margin: 0 0 18px; }
+  .metric { padding: 12px; }
+  .metric strong { font-size: 23px; }
+  .below-grid, .live-lower { display: flex; flex-direction: column; gap: 18px; }
+  .below-grid > *, .live-lower > * { width: 100%; }
+  .state-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .statebtn { font-size: 12px; }
+  .live-page .switcher { display: flex; flex-wrap: nowrap; gap: 8px; padding: 10px 0; }
+  .tabs { width: auto; }
+  .tab { padding: 8px 9px; font-size: 11px; min-height: 40px; }
+  .chooser { width: auto; flex: 1; min-width: 0; }
+  .chooser label { display: none; }
+  .chooser select { min-width: 0; width: 100%; padding: 8px 5px; font-size: 11px; min-height: 44px; }
+  .live-stage .hero { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .right-hero { margin: 10px 0 0; }
+  .alert { margin: 12px 0 0; font-size: 10px; padding: 9px 11px; }
+  .alert strong { font-size: 11px; }
+  .alert #alert-text { font-size: 10px; }
+  .stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .stat { padding: 12px; }
+  .stat small { font-size: 9px; }
+  .stat span { font-size: 10px; }
+  .state-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .footer { margin-top: 20px; }
+}
+@media (max-width: 360px) {
+  .brand strong { font-size: 16px; }
+  .brand span { display: none; }
+  .brazil-mark { width: 27px; height: 32px; }
+  .live-nav { font-size: 10px; padding: 8px; }
+  .seg { padding: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .live-nav[data-live-state="counting"] .live-dot { animation: none; } }
+
+/* Polimento com o pacote de SVGs fornecido, sem alterar a composição do mapa. */
+.intro-landscape { display: block; width: 100%; height: 128px; object-fit: cover; object-position: right bottom; margin-top: 18px; border-radius: 0 0 12px 12px; pointer-events: none; }
+.live-stage .intro-landscape { height: 118px; opacity: .85; }
+.election-explorer { padding: 24px 0; border-top: 1px solid var(--line); }
+.election-explorer-heading { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 16px; }
+.election-explorer h2 { margin: 5px 0 0; font-size: 25px; letter-spacing: -.045em; line-height: 1.2; }
+.election-explorer-heading p { margin: 0; color: var(--muted); font-size: 12px; max-width: 300px; }
+.election-cards { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+.election-card { position: relative; min-height: 160px; overflow: hidden; padding: 20px; border: 1px solid #d8e3d6; border-radius: 12px; background: var(--surface); color: var(--ink); text-align: left; transition: border-color .18s, box-shadow .18s; }
+.election-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.election-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, #fffefaeb 0%, #fffefa80 35%, transparent 65%); }
+.election-card-copy { position: relative; z-index: 1; display: block; max-width: 150px; }
+.election-card-copy strong { display: block; font-size: 32px; letter-spacing: -.06em; line-height: 1; }
+.election-card-copy > span { display: block; margin-top: 8px; font-size: 12px; }
+.election-card-arrow { position: absolute; z-index: 1; left: 20px; bottom: 16px; width: 27px; height: 27px; display: grid; place-items: center; background: #fffefae8; color: var(--green); border-radius: 50%; font-size: 17px; }
+.election-card-selected { display: none; position: absolute; z-index: 1; top: 14px; right: 12px; border-radius: 4px; padding: 3px 6px; font-size: 9px; font-weight: 650; background: var(--green); color: white; }
+.election-card[aria-pressed="true"] { border-color: var(--green); box-shadow: 0 0 0 1px var(--green); }
+.election-card[aria-pressed="true"] .election-card-selected { display: block; }
+.election-card:hover { border-color: var(--green); box-shadow: 0 4px 16px #142f3510; }
+.detail #candidate-list, .score #candidates { scrollbar-gutter: stable; }
+.detail .vote, .score .candidate { border-bottom-color: #e1e7dc; }
+.detail .vname, .score .cand-body { padding-left: 2px; }
+.detail .track, .score .rail { height: 7px; }
+.explore { position: relative; background: #fffefa; }
+.explore > .secrow { padding-right: 320px; min-height: 52px; }
+.explore > .search { position: absolute; right: 20px; top: 20px; width: 285px; margin: 0; min-height: 42px; }
+.explore .state-list { margin-top: 16px; max-height: 210px; overflow-y: auto; grid-template-columns: repeat(4,minmax(0,1fr)); padding: 0 5px 5px 0; scrollbar-gutter: stable; }
+.explore .nationalbtn { position: sticky; top: 0; z-index: 1; background: #edf3e8; }
+.explore .statebtn { min-height: 42px; }
+.footer { position: relative; isolation: isolate; padding-bottom: 76px; }
+.footer::after { content: ""; position: absolute; left: -36px; bottom: -36px; width: calc(100% + 72px); height: 72px; background: url('assets/ondas-rodape-brasil.svg') center / cover no-repeat; z-index: -1; opacity: .6; pointer-events: none; }
+@media (min-width: 801px) and (max-width: 1190px) {
+  .intro-landscape { display: none; }
+  .footer::after { left: -24px; width: calc(100% + 48px); }
+}
+@media (max-width: 800px) {
+  .intro-landscape { display: none; }
+  .election-explorer { padding: 20px 0; }
+  .election-explorer-heading { display: block; margin-bottom: 14px; }
+  .election-explorer h2 { font-size: 23px; }
+  .election-explorer-heading p { font-size: 11px; margin-top: 8px; }
+  .election-cards { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+  .election-card { min-height: 150px; padding: 16px 12px; }
+  .election-card-copy strong { font-size: 29px; }
+  .election-card-copy > span { font-size: 11px; max-width: 110px; }
+  .election-card-arrow { left: 12px; bottom: 12px; }
+  .election-card-selected { font-size: 8px; padding: 2px 4px; top: auto; right: 8px; bottom: 14px; }
+  .explore > .secrow { padding-right: 0; min-height: 0; }
+  .explore > .search { position: static; width: 100%; margin: 14px 0 10px; }
+  .explore .state-list { grid-template-columns: repeat(2,minmax(0,1fr)); max-height: 245px; margin-top: 10px; }
+  .explore .statebtn { min-height: 44px; }
+  .footer { padding-bottom: 48px; }
+  .footer::after { left: -16px; bottom: -36px; width: calc(100% + 32px); height: 44px; opacity: .45; }
+}
