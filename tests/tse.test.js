@@ -18,6 +18,7 @@ function sample({uf='BR',cargo='presidente',votes=0,counted=0}={}){
     van:String(votes?100:0),vb:String(votes?10:0),tvn:String(votes?30:0),vn:String(votes?25:0),vnt:String(votes?5:0)}
  };
 }
+test.beforeEach(()=>core.resetForTests());
 function response(){return{statusCode:200,headers:{},setHeader(k,v){this.headers[k]=v},end(x){this.data=JSON.parse(x)}}}
 test('URLs oficiais do TSE para segundo turno',()=>{
  assert.equal(core.urlFor('presidente','BR'),'https://resultados.tse.jus.br/oficial/ele2026/6258/dados/br/br-c0001-e006258-u.json');

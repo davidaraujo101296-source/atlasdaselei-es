@@ -13,6 +13,8 @@
     control.setAttribute('aria-label', 'Apuração ao vivo — ' + descriptions[stage]);
   }
   function officialStage(data) {
+    // Arquivo antigo servido em falha do TSE não é tratado como apuração ao vivo.
+    if (data?.stale) return 'unavailable';
     return data?.ok && data.source === 'TSE' && ['counting', 'final'].includes(data.stage)
       ? data.stage : 'waiting';
   }

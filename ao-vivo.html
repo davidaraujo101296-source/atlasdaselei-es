@@ -47,6 +47,7 @@ function setBanner(){
  const el=$('status-alert'), badge=$('stage-badge');el.classList.remove('hidden','demo');badge.className='badge warn';
  if(demo){el.classList.add('demo');$('alert-title').textContent='MODO DEMONSTRAÇÃO — ESTES VOTOS SÃO FICTÍCIOS';$('alert-text').textContent='Prévia visual para testes. Os candidatos A/B e todos os números abaixo são inventados. Abra a página sem o modo demonstração para consultar a fonte oficial.';badge.className='badge demo';badge.textContent='Simulação — não oficial';return}
  if(state.err){$('alert-title').textContent=state.data?'Conexão instável: exibindo última consulta':'Não foi possível consultar o TSE';$('alert-text').textContent='Os dados podem estar desatualizados. Nenhum número foi estimado. Tente atualizar novamente.';badge.textContent='Fonte temporariamente indisponível';return}
+ if(state.data?.stale){$('alert-title').textContent='Resultado oficial desatualizado';$('alert-text').textContent='O TSE não respondeu na última verificação. Exibindo o último arquivo oficial obtido em '+timestamp(state.data.fetchedAt)+'. Nenhum número foi estimado; a página tenta atualizar automaticamente.';badge.textContent='Dados desatualizados';return}
  const stage=state.data?.stage||'waiting';
  if(stage==='final'){el.classList.add('hidden');badge.className='badge live';badge.innerHTML='<span class="pulse"></span>Totalização concluída'}
  else if(stage==='counting'){el.classList.add('hidden');badge.className='badge live';badge.innerHTML='<span class="pulse"></span>Apuração em andamento'}
