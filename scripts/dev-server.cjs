@@ -32,13 +32,15 @@ const server = http.createServer(async (req, res) => {
       await handler(req, res);
       return;
     }
-    const file = pages.get(url.pathname);
+    // Resultados históricos estáticos: somente arquivos .json de dados/historico/.
+    const historico = /^\/dados\/historico\/[a-z0-9-]+\.json$/.test(url.pathname) ? url.pathname.slice(1) : null;
+    const file = historico || pages.get(url.pathname);
     if (!file) { res.writeHead(404); res.end('Não encontrado'); return; }
     if (!['GET', 'HEAD'].includes(req.method)) {
       res.writeHead(405, { Allow: 'GET, HEAD' }); res.end(); return;
     }
     const body = await fs.readFile(path.join(root, file));
-    const type = file.endsWith('.webp') ? 'image/webp' : file.endsWith('.svg') ? 'image/svg+xml' : file.endsWith('.css') ? 'text/css' : file.endsWith('.html') ? 'text/html' : file.endsWith('.js') ? 'text/javascript' : 'text/plain';
+    const type = file.endsWith('.webp') ? 'image/webp' : file.endsWith('.svg') ? 'image/svg+xml' : file.endsWith('.css') ? 'text/css' : file.endsWith('.html') ? 'text/html' : file.endsWith('.js') ? 'text/javascript' : file.endsWith('.json') ? 'application/json' : 'text/plain';
     res.writeHead(200, { 'Content-Type': type + '; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end(req.method === 'HEAD' ? undefined : body);
   } catch (error) {

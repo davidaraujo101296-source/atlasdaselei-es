@@ -92,6 +92,18 @@ Os testes unitários verificam o formato do endereço oficial, a validação de 
 - Monitorar o site no horário de divulgação. O modo “ao vivo” é **atualização automática periódica**, não transmissão de vídeo ou push em tempo real.
 - A Vercel Hobby é de **uso pessoal/não comercial**; caso o projeto passe a exibir anúncios ou operar comercialmente, reavaliar a hospedagem/plano.
 
+## Histórico presidencial em arquivos estáticos
+
+Os resultados presidenciais de **2018 (1º e 2º turnos), 2022 (1º e 2º turnos) e 2026 (1º turno)** ficam em `dados/historico/presidente-<ano>-<turno>.json`. O navegador carrega cada arquivo uma vez por sessão; a navegação não consulta o TSE para esses resultados.
+
+Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candidato (indexados pelo identificador oficial `SQ_CANDIDATO`/`sqcand`), percentuais sobre votos válidos, brancos e nulos com percentual sobre o total de votos, comparecimento, abstenções, fonte oficial e data de extração e validação.
+
+- **Fontes:** 2018 e 2022 vêm do Portal de Dados Abertos do TSE (`votacao_candidato_munzona` e `detalhe_votacao_munzona`). O importador lê só a entrada `_BR.csv` dos ZIPs, via HTTP Range. 2026 (1º turno) vem dos arquivos oficiais de divulgação, com totalização final.
+- **Validações (o importador falha se alguma não fechar):** soma dos candidatos = votos válidos em cada área; válidos + brancos + nulos + anulados = total de votos; comparecimento + abstenções + eleitores de seções não instaladas = aptos; Brasil = 27 UFs + exterior. Em 2026, o arquivo nacional do TSE é conferido contra a soma dos estaduais, e o percentual calculado contra o publicado (`pvap`).
+- **Atualizar em caso de retificação oficial:** `node scripts/historico/importar-presidente.cjs --atualizar` e depois `npm test`. Os arquivos brutos ficam em `dados-brutos/`, fora do Git e do site.
+
+**Ainda dependem de consulta externa pelo navegador:** governador, senador e deputados (2022 e 2026) e prefeito e vereador (2024). Esses cargos não foram migrados. Os arquivos JSON de divulgação de 2022 no `resultados.tse.jus.br` respondem 404 desde a verificação de 23/10/2026; para governador e senador de 2022, o site usa o CSV compilado pelo NOPolitica.
+
 ## Documentação oficial
 
 - [TSE: Informações técnicas para divulgação 2026](https://www.tse.jus.br/eleicoes/informacoes-tecnicas-sobre-a-divulgacao-de-resultados)
