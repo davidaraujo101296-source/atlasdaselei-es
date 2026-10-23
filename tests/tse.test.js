@@ -86,3 +86,8 @@ test('Mapa consulta 27 UFs após totalização começar, com fonte TSE',async()=
   assert.equal(calls,28);assert.equal(new Set(r.data.states.map(s=>s.uf)).size,27);
  }finally{Date.now=prev;global.fetch=oldFetch}
 });
+
+test('EA20 sem campo vv não pode ser exibido como resultado válido',()=>{
+ const data=sample({votes:5000});delete data.v.vv;
+ assert.throws(()=>core.normalize(data,'presidente','BR','source'),/EA20 incompleta/);
+});
