@@ -19,6 +19,13 @@
     const s = Number(params.get(param));
     if (Number.isFinite(s) && s >= 5 && s <= 300) config[chave] = s * 1000;
   }
+  // A visão nacional entre parciais nunca dura mais que a visão nacional configurada.
+  config.nacionalEntreParciaisMs = Math.min(config.nacionalEntreParciaisMs, config.nacionalMs);
+  // Somente na demonstração acelerada (?ritmo=): as consultas ao simulador acompanham o ritmo.
+  if (DEMO) {
+    const ritmo = Math.max(1, Math.min(20, Number(params.get('ritmo')) || 1));
+    for (const chave of ['consultaNacionalMs', 'consultaMapaMs', 'consultaPreMapaMs', 'repetirMinMs', 'repetirMaxMs']) config[chave] = Math.max(2000, Math.round(config[chave] / ritmo));
+  }
 
   const $ = id => document.getElementById(id);
   const safe = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

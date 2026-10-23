@@ -144,6 +144,7 @@ test('demonstração isolada: só carrega com ?demo=1 e o modo real não a usa',
  assert.match(js,/if \(DEMO\) \{[\s\S]*?fonte = await carregarDemo\(\);[\s\S]*?\} else \{\s*fonte = fonteReal;/);
  assert.match(ler('transmissao-demo.js'),/DEMONSTRAÇÃO — DADOS FICTÍCIOS/);
  assert.ok(js.includes("const ARQUIVO = DEMO ? 'Horário simulado' : 'Arquivo oficial do TSE';"),'demonstração não usa rótulo oficial');
+ assert.match(js,/if \(DEMO\) \{\s*const ritmo = /,'consultas aceleradas somente na demonstração');
  assert.match(html,/DEMONSTRAÇÃO — DADOS FICTÍCIOS/);
 });
 test('mapa estático das 27 UFs gerado da malha do IBGE',()=>{
