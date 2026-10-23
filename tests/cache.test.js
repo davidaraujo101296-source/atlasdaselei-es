@@ -1,7 +1,11 @@
 'use strict';
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const {readTSE,reply}=require('../lib/tse');
+const core=require('../lib/tse');
+const {readTSE,readOfficial,reply,START}=core;
+const apuracao=require('../api/apuracao');
+const mapa=require('../api/mapa');
+test.beforeEach(()=>core.resetForTests());
 
 function fixture(uf='SP'){
   return {
@@ -20,7 +24,7 @@ function mockResponse(){
  return {
    statusCode:200,headers,
    setHeader(key,value){headers[key.toLowerCase()]=value},
-   end(text){this.body=JSON.parse(text)}
+   end(text){this.body=text?JSON.parse(text):undefined}
  };
 }
 
@@ -77,3 +81,99 @@ test('HTTP 429 interrompe novas consultas externas na instância',async()=>{
    assert.equal(total,1);
  }finally{global.fetch=previous}
 });
+
+// Relógio controlado: os testes abaixo nunca chamam o TSE real.
+function withClock(start,fn){
+ const prevNow=Date.now,prevFetch=global.fetch;let now=Date.parse(start);
+ Date.now=()=>now;
+ const clock={advance(ms){now+=ms}};
+ return Promise.resolve().then(()=>fn(clock)).finally(()=>{Date.now=prevNow;global.fetch=prevFetch});
+}
+const ok=(uf='BR')=>({ok:true,headers:{get:()=>null},json:async()=>fixture(uf)});
+const fail=(status,retry=null)=>({ok:false,status,headers:{get:k=>k==='retry-after'?retry:null}});
+test('instância reaproveita o arquivo válido por 12s durante a apuração',()=>withClock('2026-10-25T19:00:00-03:00',async clock=>{
+ let total=0;global.fetch=async()=>{total++;return ok()};
+ await readTSE('presidente','BR');clock.advance(5000);await readTSE('presidente','BR');
+ assert.equal(total,1);
+ clock.advance(8000);await readTSE('presidente','BR');
+ assert.equal(total,2);
+}));
+test('falha do TSE devolve o último arquivo autêntico marcado como desatualizado',()=>withClock('2026-10-25T19:00:00-03:00',async clock=>{
+ let total=0,mode='ok';global.fetch=async()=>{total++;return mode==='ok'?ok():fail(503)};
+ const first=await readOfficial('presidente','BR');
+ assert.equal(first.stale,undefined);
+ mode='erro';clock.advance(20000);
+ const stale=await readOfficial('presidente','BR');
+ assert.equal(stale.stale,true);assert.equal(stale.votes.valid,920);assert.equal(stale.fetchedAt,first.fetchedAt);
+ assert.match(stale.staleReason,/último arquivo válido/);
+ await readOfficial('presidente','BR');
+ assert.equal(total,2,'espera de 15s após 5xx evita nova consulta');
+ clock.advance(31*60*1000);
+ await assert.rejects(readOfficial('presidente','BR'),/503/);
+}));
+test('sem arquivo anterior, erro do TSE não vira resultado',()=>withClock('2026-10-25T19:00:00-03:00',async()=>{
+ global.fetch=async()=>{throw Object.assign(new Error('timeout'),{name:'TimeoutError'})};
+ await assert.rejects(readOfficial('presidente','SP'),/timeout/);
+ const r=mockResponse();await apuracao({method:'GET',url:'/api/apuracao?cargo=presidente&uf=SP',query:{cargo:'presidente',uf:'SP'}},r);
+ assert.equal(r.statusCode,503);assert.equal(r.headers['cache-control'],'no-store');assert.equal(r.body.ok,false);
+}));
+test('JSON inválido do TSE é tratado como falha, com espera curta',()=>withClock('2026-10-25T19:00:00-03:00',async clock=>{
+ let total=0;global.fetch=async()=>{total++;return {ok:true,headers:{get:()=>null},json:async()=>{throw new SyntaxError('HTML de manutenção')}}};
+ await assert.rejects(readTSE('presidente','BA'),/manutenção/);
+ await assert.rejects(readTSE('presidente','BA'),/espera/);
+ assert.equal(total,1);
+ clock.advance(16000);await assert.rejects(readTSE('presidente','BA'),/manutenção/);
+ assert.equal(total,2);
+}));
+test('HTTP 429 respeita Retry-After e volta a consultar depois',()=>withClock('2026-10-25T19:00:00-03:00',async clock=>{
+ let total=0,mode='429';global.fetch=async()=>{total++;return mode==='429'?fail(429,'60'):ok('PE')};
+ await assert.rejects(readTSE('presidente','PE'),/429/);
+ clock.advance(59000);await assert.rejects(readTSE('presidente','PE'),/limitado/);
+ assert.equal(total,1);
+ mode='ok';clock.advance(2000);
+ assert.equal((await readTSE('presidente','PE')).uf,'PE');
+ assert.equal(total,2);
+}));
+test('HTTP 429 sem Retry-After aumenta a espera progressivamente',()=>withClock('2026-10-25T19:00:00-03:00',async clock=>{
+ let total=0;global.fetch=async()=>{total++;return fail(429)};
+ await assert.rejects(readTSE('presidente','RS'),/429/);
+ clock.advance(2*60*1000+1);await assert.rejects(readTSE('presidente','RS'),/429/);
+ clock.advance(2*60*1000+1);await assert.rejects(readTSE('presidente','RS'),/limitado/);
+ assert.equal(total,2);
+}));
+test('variações de query string redirecionam para a chave canônica sem consultar o TSE',()=>withClock('2026-10-25T19:00:00-03:00',async()=>{
+ let total=0;global.fetch=async()=>{total++;return ok()};
+ for(const url of ['/api/apuracao?uf=BR&cargo=presidente','/api/apuracao?cargo=presidente&uf=BR&x=1','/api/apuracao?cargo=presidente&uf=br','/api/apuracao']){
+  const u=new URL(url,'http://x'),r=mockResponse();
+  await apuracao({method:'GET',url,query:Object.fromEntries(u.searchParams)},r);
+  assert.equal(r.statusCode,308,url);assert.equal(r.headers.location,'/api/apuracao?cargo=presidente&uf=BR');
+ }
+ const m=mockResponse();await mapa({method:'GET',url:'/api/mapa?t=123',query:{t:'123'}},m);
+ assert.equal(m.statusCode,308);assert.equal(m.headers.location,'/api/mapa');
+ assert.equal(total,0);
+ const r=mockResponse();await apuracao({method:'GET',url:'/api/apuracao?cargo=presidente&uf=BR',query:{cargo:'presidente',uf:'BR'}},r);
+ assert.equal(r.statusCode,200);assert.equal(total,1);
+}));
+test('cache anterior ao início não atravessa o horário de divulgação',()=>withClock(new Date(START-45000).toISOString(),async()=>{
+ global.fetch=async()=>ok();
+ const r=mockResponse();await apuracao({method:'GET',query:{cargo:'presidente',uf:'BR'}},r);
+ assert.match(r.headers['cache-control'],/s-maxage=45,/);
+ const g=mockResponse();await apuracao({method:'GET',query:{cargo:'governador',uf:'AC'}},g);
+ assert.match(g.headers['cache-control'],/s-maxage=45,/);
+}));
+test('resposta desatualizada tem cache curto e identificação',()=>withClock('2026-10-25T19:00:00-03:00',async clock=>{
+ let mode='ok';global.fetch=async()=>mode==='ok'?ok():fail(502);
+ await readTSE('presidente','BR');mode='erro';clock.advance(13000);
+ const r=mockResponse();await apuracao({method:'GET',query:{cargo:'presidente',uf:'BR'}},r);
+ assert.equal(r.statusCode,200);assert.equal(r.body.stale,true);assert.match(r.headers['cache-control'],/s-maxage=10,/);
+}));
+test('mapa respeita prazo total e devolve estados parciais identificados',()=>withClock('2026-10-25T19:00:00-03:00',async clock=>{
+ let calls=0;
+ global.fetch=async u=>{calls++;clock.advance(3000);const uf=(u.match(/\/dados\/([a-z]{2})\//)||[])[1]?.toUpperCase();return ok(uf)};
+ const r=mockResponse();await mapa({method:'GET',query:{}},r);
+ assert.equal(r.statusCode,200);
+ assert.ok(r.body.states.length<27&&r.body.states.length>0);
+ assert.equal(r.body.errors,27-r.body.states.length);
+ assert.match(r.headers['cache-control'],/s-maxage=20,/);
+ assert.ok(calls<28);
+}));
