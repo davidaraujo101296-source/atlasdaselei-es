@@ -1,0 +1,184 @@
+/* Direção editorial brasileira. A arte é decorativa; o mapa e suas cores vêm dos dados. */
+:root { --ink: #102d36; --text: #102d36; --muted: #53666b; --surface: #fffefb; --panel: #fffefb; --page-gutter: 48px; --number-font: "Segoe UI", system-ui, -apple-system, sans-serif; }
+body { background: #faf8f2; font-size: 15px; font-variant-numeric: lining-nums tabular-nums; }
+.wrap, .container { max-width: 1600px; padding-left: 48px; padding-right: 48px; }
+.top, .header { background: #fffefa; }
+.top { position: relative; border-bottom-color: #e8e8df; }
+.top::before { content: ""; position: absolute; inset: 0 calc(-1 * var(--page-gutter)); background: #fffefa; z-index: -1; }
+.top, .nav { min-height: 86px; }
+.brand strong { font: 700 29px/1.1 Georgia, "Times New Roman", serif; letter-spacing: -.055em; }
+.brand span { font-size: 8px; letter-spacing: .19em; margin-top: 6px; }
+.brazil-mark { width: 49px; height: 49px; }
+.portal-nav { gap: 30px; }
+.portal-nav a { font-size: 13px; }
+.live-nav { border-radius: 10px; min-height: 46px; padding: 11px 20px; background: #d71920; box-shadow: 0 4px 12px #b9141510; }
+.live-dot { background: white; box-shadow: 0 0 0 4px #ffffff24; }
+.live-nav[data-live-state="final"] { background: #d71920; }
+.filters, .live-page .switcher { padding: 12px 0; border-color: #e2e5db; }
+.seg { font-size: 12px; }
+.office { font-size: 11px; }
+.flabel { font-size: 9px; }
+.election-stage { grid-template-columns: minmax(0,1.04fr) minmax(0,1.29fr) minmax(330px,1fr); gap: 24px; padding: 30px 0 44px; }
+.election-stage::before { content: ""; position: absolute; z-index: -1; pointer-events: none; bottom: 0; left: calc(-1 * var(--page-gutter)); width: calc(100% + var(--page-gutter) * 2); height: 460px; background: url('assets/brasil-aquarela.webp') center bottom / cover no-repeat; mask-image: linear-gradient(transparent, #000 62%); }
+.election-stage .hero { padding-top: 27px; }
+.hero .eyebrow { font-size: 10px; letter-spacing: .19em; color: #395767; line-height: 1.6; }
+.hero h1, .live-stage .hero h1 { font: 700 clamp(42px,3.7vw,59px)/1.035 Georgia, "Times New Roman", serif; letter-spacing: -.06em; margin: 20px 0; }
+.hero h1 em { color: #075a48; }
+.hero p { font-size: 16px; line-height: 1.55; max-width: 350px; color: #425d65; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.hero-action { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 46px; padding: 10px 16px; font-size: 13px; font-weight: 650; border-radius: 8px; border: 1px solid #aebdb4; }
+.hero-action:hover { text-decoration: none; box-shadow: 0 5px 16px #102d3616; }
+.hero-action.primary { background: #d71920; border-color: #d71920; color: white; }
+.hero-action.primary:hover { background: #b81016; }
+.hero-action.secondary { background: #fffefae8; color: var(--ink); }
+.hero-action span { font-size: 19px; line-height: 1; }
+.intro-foot { margin-top: 16px; padding-top: 0; border: 0; font-size: 11px; color: #395951; }
+.intro-foot span { background: #faf8f2e6; padding: 3px 7px; border-radius: 4px; }
+.election-stage .map-panel, .election-stage .map-box { position: relative; }
+.map, .live-stage .map { height: 475px; margin: 0; }
+.map-panel > .secrow, .map-box > .panel-head { min-height: 39px; }
+.map-panel .secrow h3, .map-box .panel-head h2 { font-size: 16px; }
+.map-panel .secrow p, .map-box .panel-head p { font-size: 11px; }
+.national-action { position: absolute; top: 41px; right: 0; z-index: 2; }
+#go-national { background: #fffefaef; font-size: 0; min-height: 30px; margin: 0; }
+#go-national::after { content: "◎ Brasil inteiro"; font-size: 11px; }
+.under-map, .map-footer { background: #fffefaf5; border: 1px solid #e3e7dc; padding: 10px 12px; border-radius: 9px; box-shadow: 0 3px 12px #142f3507; }
+.legend { font-size: 11px; }
+.map-footnote, .map-panel .fineprint { font-size: 10px; line-height: 1.5; }
+.detail, .score { background: #fffefb; border: 1px solid #e3e6dc; border-radius: 14px; padding: 20px; box-shadow: 0 8px 26px #183e3010; }
+.detail h3, .score h2 { font: 700 31px/1.16 Georgia, "Times New Roman", serif; letter-spacing: -.04em; }
+.detail h3::before, .score h2::before { content: ""; width: 29px; height: 31px; background: var(--green); mask: url('assets/brasil-silhueta.svg') center / contain no-repeat; vertical-align: -4px; margin-right: 10px; }
+.detail #candidate-list { max-height: 275px; }
+.detail .vote { padding: 10px 0; line-height: 1.4; }
+.detail .vn, .score .cand-name { font-size: 14px; font-weight: 700; }
+.detail .num, .score .cand-score strong { font-size: 23px; letter-spacing: -.04em; }
+.detail .vmeta, .score .cand-party { font-size: 11px; }
+.detail .track, .score .rail { height: 8px; }
+.candidate-toolbar input[type=text] { min-height: 36px; border-color: #d8dfd3; background: #fafbf7; }
+.toolrow .chip { background: #f0f3e9; }
+.election-explorer { display: grid; grid-template-columns: 225px minmax(0,1fr); gap: 24px; padding: 28px 0; border-top: 0; }
+.election-explorer-heading { display: block; margin: 0; }
+.election-explorer-heading .eyebrow { font-size: 9px; letter-spacing: .13em; }
+.election-explorer-heading .eyebrow::before { content: ""; display: block; width: 28px; height: 3px; background: var(--gold); border-radius: 2px; margin-bottom: 10px; }
+.election-explorer h2 { font: 700 29px/1.1 Georgia, "Times New Roman", serif; letter-spacing: -.045em; margin: 8px 0 10px; }
+.election-explorer-heading p { font-size: 12px; line-height: 1.6; }
+.election-cards { gap: 14px; }
+.election-card { display: flex; align-items: flex-start; min-height: 184px; padding: 17px; border-color: #e0e5db; border-radius: 11px; box-shadow: 0 3px 10px #142f3505; }
+.election-card img { object-position: 70% center; }
+.election-card::after { background: linear-gradient(120deg,#fffefac9, #fffefa58 44%, transparent 68%); }
+.election-card-copy { max-width: 145px; }
+.election-card-copy strong { font: 700 34px/1 var(--number-font); letter-spacing: -.025em; font-variant-numeric: lining-nums tabular-nums; }
+.election-card-copy > span { font-size: 12px; font-weight: 550; margin-top: 7px; text-shadow: 0 0 8px #fffefa; }
+.election-card-arrow { width: 30px; height: 30px; left: 17px; bottom: 14px; background: #fffefa; color: #102d36; }
+.election-card-selected { top: auto; bottom: 17px; right: 10px; font-size: 8px; }
+.election-card:hover { transform: translateY(-3px); box-shadow: 0 7px 20px #142f3515; }
+.election-card { transition: transform .18s, box-shadow .18s, border-color .18s; }
+.metrics { border-top: 1px solid #dfe3d8; border-bottom: 1px solid #dfe3d8; margin: 0 0 25px; padding: 8px 0; }
+.metric strong { font: 700 29px/1.2 var(--number-font); font-variant-numeric: lining-nums tabular-nums; letter-spacing: -.025em; }
+.num, .cand-score, .vmeta, .stat strong, .progress-heading strong, .progress-foot, .chip, .seg, .tag, .badge { font-family: var(--number-font); font-variant-numeric: lining-nums tabular-nums; }
+.metric small { font-size: 10px; }
+.explore { padding: 24px; border-color: #e0e5d9; background: #fffefa; }
+.explore .secrow h3, .states-head h2 { font: 700 29px/1.2 Georgia, "Times New Roman", serif; }
+.explore > .search { top: 24px; right: 24px; }
+.explore .statebtn { font-size: 12px; background: #fafbf6; border-color: #e1e6db; }
+.explore .statebtn.active { background: #e5eee1; border-color: var(--green); }
+.explore .state-list { grid-template-columns: repeat(6,minmax(0,1fr)); max-height: 178px; overflow-x: hidden; overflow-y: auto; overscroll-behavior-y: contain; }
+.explore .statebtn { min-width: 0; }
+.live-lower .state-grid { max-height: 216px; overflow-x: hidden; overflow-y: auto; padding: 4px 6px 4px 4px; scrollbar-gutter: stable; overscroll-behavior-y: contain; }
+.live-stage .hero h1 { font-size: clamp(48px,4vw,64px); }
+.live-stage .alert { background: #fffefaed; border-color: #e0bd5b; font-size: 11px; }
+.live-stage .right-hero { margin-top: 18px; }
+.live-stage .stats { background: #fffefa; border-color: #e0e5d9; }
+.live-stage .stat { padding: 12px; }
+.live-stage .stat small { font-size: 9px; }
+.live-stage .stat strong { font-size: 22px; }
+.live-stage .stat span { font-size: 11px; }
+.live-stage .side { gap: 14px; }
+.live-stage .progress-wrap { background: #f4f7ef; }
+.live-lower .source { background: #fffefa; }
+.footer { font-size: 12px; }
+@media (min-width: 1600px) { .election-stage::before { left: -48px; width: calc(100% + 96px); } }
+@media (min-width: 801px) and (max-width: 1190px) {
+  :root { --page-gutter: 28px; }
+  .wrap, .container { padding-left: 28px; padding-right: 28px; }
+  .brand strong { font-size: 25px; }
+  .portal-nav { gap: 16px; }
+  .portal-nav a { font-size: 11px; }
+  .election-stage { grid-template-columns: minmax(0,1.35fr) minmax(300px,1fr); padding-bottom: 60px; }
+  .election-stage .hero { grid-column: 1/-1; padding: 0; display: block; }
+  .election-stage .hero h1 { font-size: 39px; margin: 8px 0 10px; max-width: 680px; }
+  .election-stage .hero h1 br { display: none; }
+  .election-stage .hero p { font-size: 14px; max-width: 640px; }
+  .hero-actions { margin-top: 12px; }
+  .hero-action { min-height: 40px; padding: 8px 13px; }
+  .map, .live-stage .map { height: 460px; }
+  .election-stage::before { height: 360px; }
+  .election-explorer { grid-template-columns: 1fr; gap: 16px; }
+  .election-explorer-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; }
+  .election-explorer-heading p { max-width: 280px; }
+  .election-explorer h2 { margin-bottom: 0; }
+  .explore .state-list { grid-template-columns: repeat(4,minmax(0,1fr)); }
+}
+@media (max-width: 800px) {
+  :root { --page-gutter: 16px; }
+  .wrap, .container { padding-left: 16px; padding-right: 16px; }
+  .top, .nav { min-height: 70px; }
+  .brand strong { font-size: 20px; }
+  .brand span { font-size: 6px; margin-top: 4px; }
+  .brazil-mark { width: 34px; height: 38px; }
+  .live-nav { min-height: 40px; padding: 8px 10px; font-size: 10px; }
+  .filters { padding: 10px 0; }
+  .seg { font-size: 10px; }
+  .office { font-size: 10px; }
+  .election-stage { gap: 18px; padding: 20px 0 25px; }
+  .election-stage::before { display: none; }
+  .election-stage .hero { position: relative; isolation: isolate; padding: 0 0 12px; }
+  .election-stage .hero::before { content: ""; position: absolute; z-index: -1; inset: -10px -16px 0; pointer-events: none; background: linear-gradient(90deg,#faf8f2 18%,#faf8f2e6 50%,#faf8f245), url('assets/rio-aquarela.webp') 75% bottom / cover; opacity: .8; }
+  .hero h1, .live-stage .hero h1 { font-size: 35px; line-height: 1.04; margin: 9px 0 12px; letter-spacing: -.055em; max-width: 340px; }
+  .hero h1 br { display: none; }
+  .hero .eyebrow { font-size: 8px; letter-spacing: .13em; }
+  .hero p { font-size: 12px; line-height: 1.5; max-width: 295px; color: #334f58; }
+  .hero-actions { display: none; }
+  .intro-foot { display: none; }
+  .map, .live-stage .map { height: 330px; }
+  .map-panel > .secrow, .map-box > .panel-head { min-height: 0; }
+  .map-panel .secrow h3, .map-box .panel-head h2 { font-size: 15px; }
+  .map-panel .secrow p, .map-box .panel-head p { font-size: 10px; }
+  .national-action { top: 0; margin-top: 0; }
+  #go-national { min-height: 34px; }
+  #go-national::after { font-size: 10px; }
+  .under-map, .map-footer { padding: 10px; }
+  .detail, .score { padding: 18px; }
+  .detail #candidate-list { max-height: none; }
+  .election-explorer { display: block; padding: 20px 0 24px; }
+  .election-explorer-heading { margin-bottom: 16px; }
+  .election-explorer h2 { font-size: 28px; }
+  .election-explorer-heading p { font-size: 12px; }
+  .election-cards { gap: 12px; }
+  .election-card { min-height: 178px; padding: 14px; }
+  .election-card-copy strong { font-size: 31px; }
+  .election-card-copy > span { font-size: 11px; }
+  .election-card-arrow { left: 14px; }
+  .election-card-selected { right: 6px; font-size: 7px; }
+  .explore { padding: 18px; }
+  .explore .secrow h3, .states-head h2 { font-size: 26px; }
+  .explore .statebtn { font-size: 11px; }
+  .explore .state-list { grid-template-columns: repeat(2,minmax(0,1fr)); max-height: 196px; }
+  .live-lower .state-grid { max-height: 196px; }
+  .live-stage .hero { display: block; }
+  .live-stage .hero p { max-width: 320px; }
+  .live-stage .right-hero { margin-top: 10px; }
+  .live-stage .alert { font-size: 10px; margin-top: 10px; }
+  .live-stage .hero::before { opacity: .45; }
+  .footer { font-size: 11px; }
+}
+@media (max-width: 360px) {
+  .brand strong { font-size: 18px; }
+  .brazil-mark { width: 27px; }
+  .live-nav { font-size: 10px; padding: 8px; }
+  .hero h1, .live-stage .hero h1 { font-size: 30px; }
+  .hero p { font-size: 11px; }
+  .map, .live-stage .map { height: 300px; }
+  .election-card { min-height: 164px; padding: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .election-card { transition: none; } .election-card:hover { transform: none; } }
