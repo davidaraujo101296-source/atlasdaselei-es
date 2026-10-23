@@ -134,7 +134,7 @@ async function loadStates(){
   for(const s of response.states||[])state.byUF.set(s.uf,s);state.mapErr='';state.lastMapFetched=Date.now();renderStateGrid();drawMap();
  }catch(e){state.mapErr=e.message}
 }
-async function getJSON(url,ms=8000){const ctl=new AbortController(),timeout=setTimeout(()=>ctl.abort(),ms);try{const r=await fetch(url,{signal:ctl.signal,cache:'no-store'});if(!r.ok){const body=await r.json().catch(()=>({}));throw Error(body.error||'HTTP '+r.status)}return await r.json()}finally{clearTimeout(timeout)}}
+async function getJSON(url,ms=8000){const ctl=new AbortController(),timeout=setTimeout(()=>ctl.abort(),ms);try{const r=await fetch(url,{signal:ctl.signal,cache:url.startsWith('/api/')?'default':'no-store'});if(!r.ok){const body=await r.json().catch(()=>({}));throw Error(body.error||'HTTP '+r.status)}return await r.json()}finally{clearTimeout(timeout)}}
 async function loadGeography(){const urls=['https://cdn.jsdelivr.net/gh/henriquemalvar/br-geojson@main/dist/estados.geojson','https://raw.githubusercontent.com/henriquemalvar/br-geojson/main/dist/estados.geojson'];for(const url of urls){try{const json=await getJSON(url,8500);const found=[];for(const f of json.features||[]){let p=f.properties||{},uf=String(p.sigla||p.uf||p.UF||p.SIGLA||'').toUpperCase();if(!NAMES[uf])uf=UFS.find(k=>NAMES[k]===(p.nome||p.name||p.NM_UF))||'';if(uf)found.push({uf,path:pathFor(f.geometry)})}if(found.length>=25){state.geo=found;drawMap();return}}catch(e){}}}
 $('tab-pres').addEventListener('click',()=>setOffice('presidente'));
 $('tab-gov').addEventListener('click',()=>setOffice('governador'));
