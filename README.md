@@ -104,6 +104,10 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 
 **Ainda dependem de consulta externa pelo navegador:** governador, senador e deputados (2022 e 2026) e prefeito e vereador (2024). Esses cargos não foram migrados. Os arquivos JSON de divulgação de 2022 no `resultados.tse.jus.br` respondem 404 desde a verificação de 23/10/2026; para governador e senador de 2022, o site usa o CSV compilado pelo NOPolitica.
 
+## Comparador eleitoral
+
+`comparar.html` compara dois resultados presidenciais oficiais (2018 1º/2º, 2022 1º/2º e 2026 1º turno) no Brasil ou numa UF, com dois mapas sincronizados, participação (comparecimento, abstenção, válidos, brancos e nulos) e candidaturas. Usa apenas os arquivos de `dados/historico/`, sem consultar o TSE nem APIs. A mesma pessoa é reconhecida pelo nome civil completo, mesmo com número ou partido diferentes. Diferenças em p.p. só aparecem entre cenários do mesmo turno. O 2º turno de 2026 não entra nesta versão. O teste de tela fica em `tests/e2e/comparar.e2e.cjs`.
+
 ## Transmissão automática (OBS + YouTube)
 
 `transmissao.html` é uma tela de 1920x1080 para o OBS. Ela alterna sozinha entre a visão nacional, um estado em destaque e as novas parciais. Os dados vêm **sempre** das APIs públicas da Vercel (`/api/apuracao?cargo=presidente&uf=BR` e `/api/mapa`), nas URLs canônicas, mesmo com a página aberta em `127.0.0.1`. Ela não consulta o TSE diretamente.

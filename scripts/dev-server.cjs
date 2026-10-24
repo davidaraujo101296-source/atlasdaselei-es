@@ -13,6 +13,7 @@ const pages = new Map([
   ['/atlas.html', 'atlas.html'], ['/ao-vivo.html', 'ao-vivo.html'],
   ['/styles.css', 'styles.css'], ['/live-status.js', 'live-status.js'], ['/robots.txt', 'robots.txt'],
   ['/election-cards.js', 'election-cards.js'],
+  ...['comparar.html', 'comparar.css', 'comparar.js', 'comparar-core.js'].map(file => ['/' + file, file]),
   // Página de transmissão (OBS). Os dados vêm das APIs públicas da Vercel, não destes handlers.
   ...['transmissao.html', 'transmissao.css', 'transmissao.js', 'transmissao-core.js', 'transmissao-demo.js', 'assets/transmissao-estados.json']
     .map(file => ['/' + file, file]),
