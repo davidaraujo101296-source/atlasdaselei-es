@@ -106,7 +106,7 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 
 ## Contador de audiência (desligado por padrão)
 
- mostra, perto da navegação, quantas pessoas estão online agora, os visitantes e as visualizações do dia, o pico de simultâneos e o tempo de permanência. Os dados vêm de , que guarda tudo num Redis gerenciado (Upstash) compartilhado entre as instâncias. Sem o serviço configurado, o painel mostra **"Estatísticas indisponíveis"**, nunca zero. A transmissão do OBS () não carrega o contador.
+`audiencia.js` mostra, perto da navegação, quantas pessoas estão online agora, os visitantes e as visualizações do dia, o pico de simultâneos e o tempo de permanência. Os dados vêm de `/api/audiencia`, que guarda tudo num Redis gerenciado (Upstash) compartilhado entre as instâncias. Sem o serviço configurado, o painel mostra **"Estatísticas indisponíveis"**, nunca zero. A transmissão do OBS (`transmissao.html`) não carrega o contador.
 
 **Definições:**
 - **Online:** navegador com página aberta e visível que enviou sinal nos últimos 7 minutos. Só uma aba por navegador envia.
@@ -117,13 +117,13 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 - Com muitos acessos, só uma fração dos navegadores envia sinais e os números aparecem como estimativa (≈).
 
 **Para ligar (ação humana):**
-1. Na Vercel: projeto → **Storage** → **Upstash for Redis** → plano **Free** → conectar ao projeto. Isso cria as variáveis  e .
-2. Em **Settings → Environment Variables** (Production):  e, de preferência,  com um texto aleatório longo.
+1. Na Vercel: projeto → **Storage** → **Upstash for Redis** → plano **Free** → conectar ao projeto. Isso cria as variáveis `KV_REST_API_URL` e `KV_REST_API_TOKEN`.
+2. Em **Settings → Environment Variables** (Production): `AUDIENCIA_ATIVA=1` e, de preferência, `AUDIENCIA_SEGREDO` com um texto aleatório longo.
 3. Publicar de novo, com um novo deploy.
 
 **Para desligar sem derrubar o site:**
-- **Imediato:** no console do Upstash, . A coleta para em 1 a 2 minutos e as leituras continuam.
-- **Completo:** remover  e publicar.
+- **Imediato:** no console do Upstash, `SET aud:desligado 1`. A coleta para em 1 a 2 minutos e as leituras continuam. Para religar, `DEL aud:desligado`.
+- **Completo:** remover `AUDIENCIA_ATIVA` e publicar.
 
 **Proteções:**
 - orçamentos de escritas (25 mil/dia e 60 mil/mês) e de comandos Redis (400 mil/mês, abaixo dos 500 mil gratuitos);
@@ -132,7 +132,7 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 - só aceita sinais da própria origem;
 - leitura cacheada por 30 s no CDN e amostragem adaptativa.
 
-Todos os limites podem ser ajustados pelas variáveis  (ver ).
+Todos os limites podem ser ajustados pelas variáveis `AUDIENCIA_*` (ver `lib/audiencia.js`).
 
 ## Transmissão automática (OBS + YouTube)
 
