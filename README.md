@@ -104,6 +104,36 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 
 **Ainda dependem de consulta externa pelo navegador:** governador, senador e deputados (2022 e 2026) e prefeito e vereador (2024). Esses cargos não foram migrados. Os arquivos JSON de divulgação de 2022 no `resultados.tse.jus.br` respondem 404 desde a verificação de 23/10/2026; para governador e senador de 2022, o site usa o CSV compilado pelo NOPolitica.
 
+## Contador de audiência (desligado por padrão)
+
+ mostra, perto da navegação, quantas pessoas estão online agora, os visitantes e as visualizações do dia, o pico de simultâneos e o tempo de permanência. Os dados vêm de , que guarda tudo num Redis gerenciado (Upstash) compartilhado entre as instâncias. Sem o serviço configurado, o painel mostra **"Estatísticas indisponíveis"**, nunca zero. A transmissão do OBS () não carrega o contador.
+
+**Definições:**
+- **Online:** navegador com página aberta e visível que enviou sinal nos últimos 7 minutos. Só uma aba por navegador envia.
+- **Visitantes:** identificadores anônimos distintos do dia, renovados diariamente.
+- **Visualizações:** carregamentos de página.
+- **Pico:** maior número de simultâneos registrado no dia.
+- **Permanência:** soma estimada do tempo de páginas visíveis.
+- Com muitos acessos, só uma fração dos navegadores envia sinais e os números aparecem como estimativa (≈).
+
+**Para ligar (ação humana):**
+1. Na Vercel: projeto → **Storage** → **Upstash for Redis** → plano **Free** → conectar ao projeto. Isso cria as variáveis  e .
+2. Em **Settings → Environment Variables** (Production):  e, de preferência,  com um texto aleatório longo.
+3. Publicar de novo, com um novo deploy.
+
+**Para desligar sem derrubar o site:**
+- **Imediato:** no console do Upstash, . A coleta para em 1 a 2 minutos e as leituras continuam.
+- **Completo:** remover  e publicar.
+
+**Proteções:**
+- orçamentos de escritas (25 mil/dia e 60 mil/mês) e de comandos Redis (400 mil/mês, abaixo dos 500 mil gratuitos);
+- limite por IP (só um hash diário com segredo; o IP nunca é gravado);
+- um sinal de presença por visitante por minuto e filtro de robôs;
+- só aceita sinais da própria origem;
+- leitura cacheada por 30 s no CDN e amostragem adaptativa.
+
+Todos os limites podem ser ajustados pelas variáveis  (ver ).
+
 ## Transmissão automática (OBS + YouTube)
 
 `transmissao.html` é uma tela de 1920x1080 para o OBS. Ela alterna sozinha entre a visão nacional, um estado em destaque e as novas parciais. Os dados vêm **sempre** das APIs públicas da Vercel (`/api/apuracao?cargo=presidente&uf=BR` e `/api/mapa`), nas URLs canônicas, mesmo com a página aberta em `127.0.0.1`. Ela não consulta o TSE diretamente.

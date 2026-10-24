@@ -7,12 +7,14 @@ const root = path.resolve(__dirname, '..');
 const handlers = {
   '/api/apuracao': require('../api/apuracao'),
   '/api/mapa': require('../api/mapa'),
+  '/api/audiencia': require('../api/audiencia'),
 };
 const pages = new Map([
   ['/', 'index.html'], ['/index.html', 'index.html'],
   ['/atlas.html', 'atlas.html'], ['/ao-vivo.html', 'ao-vivo.html'],
   ['/styles.css', 'styles.css'], ['/live-status.js', 'live-status.js'], ['/robots.txt', 'robots.txt'],
   ['/election-cards.js', 'election-cards.js'],
+  ['/audiencia.js', 'audiencia.js'],
   // Página de transmissão (OBS). Os dados vêm das APIs públicas da Vercel, não destes handlers.
   ...['transmissao.html', 'transmissao.css', 'transmissao.js', 'transmissao-core.js', 'transmissao-demo.js', 'assets/transmissao-estados.json']
     .map(file => ['/' + file, file]),
