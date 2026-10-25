@@ -151,6 +151,26 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 
 **Tempos de cena** (opcionais, em segundos): `transmissao.html?nacional=20&estado=15&parcial=15`.
 
+**Cards de divulgação (`transmissao-cartoes.js`):** o ciclo dura exatamente 11 min e é sempre recalculado pelo relógio (fase = tempo decorrido % 660 s):
+
+| Trecho do ciclo | Card |
+|---|---|
+| 00:00–08:00 | nenhum |
+| 08:00–10:00 | doação via Pix |
+| 10:00–10:30 | nenhum |
+| 10:30–11:00 | compartilhamento |
+
+- **Sequência:** o ciclo *n* mostra a Doação *n* e o Compartilhamento *n*. Depois de 20 ciclos (3 h 40 min), as duas sequências recomeçam.
+- **Doação:** QR Pix validado, chave e "Contribuição voluntária".
+- **Compartilhamento:** QR que abre `https://www.atlaseleitoral.org`.
+- **Posição:** o card entra numa faixa à direita do painel do mapa. O mapa encolhe antes de ele entrar e volta depois de ele sair, então nada do mapa, do placar, da legenda ou dos avisos fica coberto. O diretor de cenas não muda.
+- **Recarga:** no modo real, recarregar a página no mesmo dia continua o ciclo de onde estava.
+- **Desligar sem deploy:** `transmissao.html?cartoes=desligado`.
+- **Ensaio:** na demonstração, `?demo=1&cartoesInicio=470` começa 10 s antes do card de doação.
+- **Teste:** `tests/e2e/cartoes.e2e.cjs` (relógio simulado).
+
+O endereço exibido no rodapé é `www.atlaseleitoral.org`. As consultas técnicas continuam na URL canônica da Vercel. O título, a descrição e a mensagem fixada para a live estão em `docs/youtube-live.txt`.
+
 **Comportamento:**
 - **Antes das 17h:** "Aguardando divulgação oficial", com contagem regressiva e sem números.
 - **Com votos:** a visão nacional dura ~20 s e o estado em destaque ~15 s, com aproximação suave no mapa.

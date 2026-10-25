@@ -94,6 +94,31 @@ body { font-family: var(--numeros); color: var(--ink); -webkit-font-smoothing: a
 }
 .demo-faixa[hidden] { display: none; }
 
+/* Cards de divulgação (doação e compartilhamento). Ficam numa faixa segura à direita do
+   painel do mapa: o mapa encolhe antes de o card entrar e só volta depois de ele sair,
+   então nada do mapa, do placar, da legenda ou dos avisos fica coberto. */
+.mapa { transition: width 1.2s cubic-bezier(.45, 0, .2, 1) .6s; }
+.painel-mapa.com-cartao .mapa { width: calc(100% - 424px); transition-delay: 0s; }
+.demo-faixa { transition: left 1.2s cubic-bezier(.45, 0, .2, 1) .6s; }
+.painel-mapa.com-cartao .demo-faixa { left: calc((100% - 424px) / 2); transition-delay: 0s; }
+.cartao {
+  position: absolute; z-index: 3; right: 0; bottom: 78px; width: 400px; display: flex; flex-direction: column;
+  padding: 22px 26px 20px; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--gold);
+  box-shadow: 0 18px 48px rgba(20, 47, 53, .12); opacity: 0; transform: translateX(28px); pointer-events: none;
+  transition: opacity .6s ease, transform .6s ease;
+}
+.cartao[data-tipo="compartilhar"] { border-top-color: var(--blue); }
+.painel-mapa.com-cartao .cartao.visivel { opacity: 1; transform: none; transition-delay: 1s; }
+.cartao-selo { font-size: 15px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--green); }
+.cartao-qr { margin: 12px 0 0; align-self: center; text-align: center; }
+.cartao-qr img { display: block; width: 216px; height: 216px; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.cartao-qr figcaption { margin-top: 6px; font-size: 14px; font-weight: 700; color: var(--muted); }
+.cartao h2 { margin: 14px 0 0; font: 700 27px/1.17 var(--serifa); letter-spacing: -.02em; }
+.cartao p { margin: 8px 0 0; font-size: 18px; line-height: 1.4; color: #2c4650; }
+.cartao-rodape { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 15px; color: var(--muted); }
+.cartao-rodape b { display: block; font-size: 16px; color: var(--green); }
+.cartao-endereco b { font-size: 25px; letter-spacing: -.01em; }
+
 /* Placar */
 .placar {
   position: relative; min-height: 0; padding: 40px 44px 34px; border-radius: 24px; background: var(--surface);
