@@ -1,0 +1,227 @@
+/* Transmissão vertical (1080x1920, Instagram/Facebook/TikTok). Mesma identidade e mesmo
+   motor da horizontal; só a composição muda. Áreas seguras: o topo (0–190 px) e a base
+   (abaixo de ~1450 px) ficam livres de dados, porque as plataformas sobrepõem perfil,
+   comentários e campo de mensagem. Margens laterais de 64 px. */
+:root {
+  --bg: #FAF8F2;
+  --surface: #fffefa;
+  --line: #dce2d8;
+  --ink: #142F35;
+  --muted: #586b67;
+  --green: #075A48;
+  --gold: #F4BF39;
+  --blue: #087EAE;
+  --live-red: #D71920;
+  --trilho: #e7ebe2;
+  --numeros: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --serifa: Georgia, "Times New Roman", serif;
+  --lado: 64px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+body { font-family: var(--numeros); color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+.tela {
+  position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; overflow: hidden;
+  background:
+    radial-gradient(900px 900px at 40% 45%, rgba(7, 90, 72, .06), transparent 70%),
+    radial-gradient(700px 500px at 90% 8%, rgba(244, 191, 57, .10), transparent 70%),
+    var(--bg);
+}
+/* Arte decorativa na base, onde as plataformas mostram os comentários. */
+.tela::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 560px; pointer-events: none;
+  background: url("assets/rio-aquarela.webp") center bottom / 1500px auto no-repeat;
+  opacity: .28; -webkit-mask-image: linear-gradient(to top, #000 45%, transparent); mask-image: linear-gradient(to top, #000 45%, transparent);
+}
+
+/* Bloco 1 — cabeçalho compacto (abaixo da faixa do perfil das plataformas). */
+.topo {
+  position: absolute; top: 190px; left: var(--lado); right: var(--lado); height: 132px;
+  display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto; align-items: center; row-gap: 14px;
+}
+.marca { grid-column: 1; grid-row: 1; }
+.situacao { grid-column: 2 / 4; grid-row: 1; }
+.titulo { grid-column: 1 / 3; grid-row: 2; white-space: nowrap; }
+.endereco-topo { grid-column: 3; grid-row: 2; }
+.marca { display: flex; align-items: center; gap: 14px; }
+.marca .brazil-mark { width: 58px; height: 58px; flex-shrink: 0; }
+.marca strong { display: block; font: 700 38px/1.05 var(--serifa); letter-spacing: -.02em; }
+.marca span { display: block; margin-top: 5px; font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.situacao { justify-self: end; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.situacao time { font-size: 17px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 999px; font-size: 17px; text-transform: uppercase; letter-spacing: .07em; border: 2px solid transparent; }
+.pill b { font-weight: 800; }
+.ponto { width: 12px; height: 12px; border-radius: 50%; background: currentColor; }
+.pill[data-estado="conectando"] { background: #eef1ea; color: var(--muted); border-color: var(--line); }
+.pill[data-estado="pre"] { background: #fff5d9; color: #6b5310; border-color: var(--gold); }
+.pill[data-estado="apuracao"] { background: var(--live-red); color: #fff; }
+.pill[data-estado="apuracao"] .ponto { animation: pulso 1.8s ease-in-out infinite; }
+.pill[data-estado="final"] { background: var(--green); color: #fff; }
+.pill[data-estado="desatualizado"] { background: #f6ead2; color: #6b4a10; border-color: #c98b1b; }
+@keyframes pulso { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.8); } }
+.titulo span { font-size: 15px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--green); margin-right: 12px; }
+.titulo strong { font: 700 23px/1.15 var(--serifa); }
+.endereco-topo { justify-self: end; font-size: 24px; color: var(--green); letter-spacing: -.01em; }
+
+/* Aviso de dados desatualizados: sempre visível, logo abaixo do cabeçalho. */
+.aviso {
+  position: absolute; z-index: 5; top: 334px; left: var(--lado); right: var(--lado); padding: 12px 20px;
+  background: #fff1d6; border: 2px solid #c98b1b; border-left-width: 10px; border-radius: 10px;
+  font-size: 20px; font-weight: 700; line-height: 1.3; color: #5a3d07; box-shadow: 0 8px 24px rgba(20, 47, 53, .12);
+}
+.aviso[hidden] { display: none; }
+.aviso { max-height: 84px; overflow: hidden; font-size: 19px; }
+.aviso:not([hidden]) ~ .corpo { top: 428px; height: 1052px; }
+
+/* Blocos 2, 3 e 4. O placar é desmontado na grade (display: contents) para o mapa ficar
+   entre o placar (em cima, área mais segura) e o status da apuração (embaixo). */
+.corpo {
+  position: absolute; top: 340px; left: var(--lado); right: var(--lado); height: 1140px; transition: top .6s ease, height .6s ease;
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto auto minmax(0, 1fr) auto auto auto auto auto;
+}
+.placar { display: contents; }
+.placar > * { grid-column: 1; min-width: 0; }
+.placar.entrando > * { animation: entrar .8s ease both; }
+@keyframes entrar { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.selo-parcial { grid-row: 1; }
+.eyebrow { grid-row: 2; }
+.placar h1 { grid-row: 3; }
+.placar .sub, .placar .data { grid-row: 4; }
+.cands, .contagem { grid-row: 5; }
+.painel-mapa { grid-row: 6; grid-column: 1; }
+.secoes, .cands.pre { grid-row: 7; }
+.outros { grid-row: 8; }
+.nota { grid-row: 9; }
+.nota ~ .nota { grid-row: 10; }
+.arquivo { grid-row: 11; }
+
+.eyebrow { font-size: 16px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--green); }
+.placar h1 { margin: 4px 0 0; font: 700 46px/1.05 var(--serifa); letter-spacing: -.02em; }
+.placar h1 .uf-tag { display: inline-block; vertical-align: middle; margin-left: 10px; padding: 3px 12px; border-radius: 8px; background: #e7efe6; color: var(--green); font: 800 24px/1.2 var(--numeros); letter-spacing: .04em; }
+.placar .sub { margin: 4px 0 0; font-size: 17px; color: var(--muted); }
+
+/* Bloco 3 — placar: dois candidatos lado a lado, números grandes. */
+.cands { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.cand {
+  display: grid; grid-template-columns: 10px minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 14px; row-gap: 6px;
+  padding: 12px 16px 14px 14px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 10px 28px rgba(20, 47, 53, .07);
+}
+.cand .cor { grid-row: 1 / 3; width: 10px; border-radius: 5px; background: var(--cor); }
+.cand .nome strong { display: block; font-size: 24px; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; overflow-wrap: anywhere; }
+.cand .nome small { display: block; margin-top: 2px; font-size: 17px; color: var(--muted); font-weight: 600; }
+.cand .eleito { display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius: 6px; background: var(--green); color: #fff; font-style: normal; font-size: 15px; font-weight: 800; }
+.cand .num { grid-column: 2; }
+.cand .num strong { display: block; font-size: 62px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.cand .num small { display: block; margin-top: 4px; font-size: 20px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.trilho { grid-column: 1 / -1; height: 12px; border-radius: 999px; background: var(--trilho); overflow: hidden; }
+.trilho i { display: block; height: 100%; border-radius: inherit; background: var(--cor, var(--green)); transition: width 1.4s ease; }
+.cands.pre { margin-top: 14px; }
+.cands.pre .cor { opacity: .55; }
+.cands.pre .num strong { font-size: 44px; }
+
+/* Bloco 2 — mapa (o maior bloco). */
+.painel-mapa { position: relative; min-height: 0; margin-top: 10px; }
+.mapa {
+  position: absolute; inset: 0 0 58px 0; width: 100%; height: calc(100% - 58px); overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent), linear-gradient(to bottom, transparent, #000 3%, #000 96%, transparent);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent), linear-gradient(to bottom, transparent, #000 3%, #000 96%, transparent);
+  mask-composite: intersect;
+  transition: width 1.2s cubic-bezier(.45, 0, .2, 1) .6s;
+}
+#camera { transform-origin: 0 0; transition: transform 1.9s cubic-bezier(.45, 0, .2, 1); }
+.uf { fill: #d5dccf; stroke: #fffefa; stroke-width: 1.2; stroke-linejoin: round; vector-effect: non-scaling-stroke; transition: fill 1.4s ease, opacity 1.2s ease; }
+.mapa.foco .uf { opacity: .38; }
+.mapa.foco .uf.ativo { opacity: 1; stroke: var(--ink); stroke-width: 3; }
+.sigla { font: 700 19px var(--numeros); fill: var(--ink); text-anchor: middle; dominant-baseline: central; opacity: .7; pointer-events: none; transition: opacity .9s ease; paint-order: stroke; stroke: rgba(255, 254, 250, .7); stroke-width: 3px; }
+.mapa.foco .sigla { opacity: 0; }
+.mapa.foco .sigla.ativo { opacity: 1; font-size: calc(32px / var(--zoom, 1)); stroke-width: calc(4px / var(--zoom, 1)); }
+.legenda { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; font-size: 18px; font-weight: 700; }
+.legenda i { display: inline-block; width: 15px; height: 15px; border-radius: 4px; margin-right: 8px; vertical-align: -2px; }
+.legenda .explica { flex-basis: 100%; font-size: 14px; font-weight: 500; color: var(--muted); }
+.mapa-nota { position: absolute; right: 0; top: 0; z-index: 4; max-width: 440px; margin: 0; padding: 10px 14px; border-radius: 10px; background: #fff1d6; border: 1px solid #e3b764; font-size: 16px; font-weight: 600; color: #5a3d07; }
+.mapa-nota[hidden] { display: none; }
+.demo-faixa {
+  position: absolute; left: 50%; top: 4px; transform: translateX(-50%); z-index: 4; padding: 10px 22px; border-radius: 10px;
+  font-size: 22px; font-weight: 900; letter-spacing: .05em; color: #4a2a00; white-space: nowrap; border: 3px solid #c46a00;
+  background: repeating-linear-gradient(135deg, #ffd27a 0 18px, #ffc04d 18px 36px);
+  transition: left 1.2s cubic-bezier(.45, 0, .2, 1) .6s;
+}
+.demo-faixa[hidden] { display: none; }
+
+/* Bloco 4 — status da apuração, compacto. */
+.secoes { margin-top: 10px; padding: 10px 16px; border-radius: 14px; background: #f3f6ef; }
+.secoes-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: 19px; font-weight: 700; }
+.secoes-topo strong { font-size: 30px; color: var(--green); font-variant-numeric: tabular-nums; }
+.trilho.largo { margin-top: 8px; height: 12px; }
+.trilho.largo i { background: var(--green); }
+.secoes small { display: block; margin-top: 4px; font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.outros { margin-top: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.outros div { padding: 6px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.outros span { display: block; font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.outros strong { display: block; margin-top: 0; font-size: 22px; font-variant-numeric: tabular-nums; }
+.outros small { display: block; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.arquivo { margin: 6px 0 0; font-size: 15px; color: var(--muted); }
+.nota { margin: 12px 0 0; font-size: 17px; color: var(--muted); }
+.nota.alerta { padding: 10px 14px; border-radius: 10px; background: #fff1d6; color: #5a3d07; font-weight: 600; }
+.selo-parcial {
+  justify-self: start; margin-bottom: 10px; padding: 8px 18px; border-radius: 999px; background: var(--gold); color: var(--ink);
+  font-size: 19px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; transition: opacity .8s ease, transform .8s ease;
+}
+.selo-parcial.saindo { opacity: 0; transform: translateY(-6px); }
+.aguardando { font-size: 50px !important; color: var(--green); }
+.data { margin: 10px 0 0; font-size: 22px; font-weight: 600; }
+.contagem { margin-top: 16px; padding: 16px 20px; border-radius: 16px; background: #f3f6ef; }
+.contagem span { display: block; font-size: 18px; font-weight: 700; color: var(--muted); }
+.contagem strong { display: block; margin-top: 4px; font-size: 74px; font-weight: 700; line-height: 1; color: var(--green); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.contagem strong.menor { font-size: 30px; line-height: 1.2; }
+
+/* Bloco 5 — rodapé, logo abaixo do status. */
+.rodape {
+  position: absolute; top: 1490px; left: var(--lado); right: var(--lado);
+  display: grid; grid-template-columns: 1fr auto; gap: 4px 20px; padding-top: 12px; align-items: center;
+  border-top: 4px solid; border-image: linear-gradient(90deg, var(--green) 0 34%, var(--gold) 34% 67%, var(--blue) 67%) 1;
+  font-size: 15px; color: var(--muted);
+}
+.rodape .hora-arquivo { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; justify-self: end; }
+.rodape .endereco { justify-self: end; font-size: 26px; color: var(--green); letter-spacing: -.01em; }
+
+/* Cards de divulgação: dividem o bloco do mapa (o mapa encolhe antes e volta depois),
+   sem cobrir mapa, placar ou status. */
+.painel-mapa.com-cartao .mapa { width: calc(100% - 462px); transition-delay: 0s; }
+.painel-mapa.com-cartao .demo-faixa { left: calc((100% - 462px) / 2); transition-delay: 0s; }
+/* Com card na tela, a nota de UFs sem atualização vai para a área do mapa (não sobre o card). */
+.painel-mapa.com-cartao .mapa-nota { right: 462px; max-width: calc(100% - 470px); }
+.cartao {
+  position: absolute; z-index: 3; right: 0; top: 0; bottom: 58px; width: 446px; display: flex; flex-direction: column; justify-content: center;
+  padding: 18px 24px; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--gold);
+  box-shadow: 0 18px 48px rgba(20, 47, 53, .12); opacity: 0; transform: translateX(28px); pointer-events: none;
+  transition: opacity .6s ease, transform .6s ease;
+}
+.cartao[data-tipo="compartilhar"] { border-top-color: var(--blue); }
+.painel-mapa.com-cartao .cartao.visivel { opacity: 1; transform: none; transition-delay: 1s; }
+.cartao-selo { font-size: 15px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--green); }
+.cartao-qr { margin: 10px 0 0; align-self: center; text-align: center; }
+.cartao-qr img { display: block; width: 196px; height: 196px; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.cartao-qr figcaption { margin-top: 5px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.cartao h2 { margin: 12px 0 0; font: 700 25px/1.16 var(--serifa); letter-spacing: -.02em; }
+.cartao p { margin: 6px 0 0; font-size: 18px; line-height: 1.35; color: #2c4650; }
+.cartao-rodape { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 15px; color: var(--muted); }
+.cartao-rodape b { display: block; font-size: 16px; color: var(--green); }
+.cartao-endereco b { font-size: 27px; letter-spacing: -.01em; }
+
+/* Guias de área segura (só com ?guias=1, para ensaio). */
+.guias { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
+.guia { position: absolute; display: flex; align-items: center; justify-content: center; background: rgba(215, 25, 32, .16); border: 3px dashed rgba(215, 25, 32, .75); }
+.guia span { padding: 6px 12px; border-radius: 8px; background: rgba(215, 25, 32, .85); color: #fff; font-size: 18px; font-weight: 800; text-align: center; }
+.guia-topo { left: 0; right: 0; top: 0; height: 190px; }
+.guia-base { left: 0; right: 0; bottom: 0; height: 420px; align-items: flex-start; padding-top: 20px; }
+.guia-lateral { right: 0; top: 900px; width: 120px; height: 560px; }
+.guia-lateral span { writing-mode: vertical-rl; }
+.guia-rotulo { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); padding: 8px 18px; border-radius: 8px; background: #000; color: #fff; font-size: 22px; font-weight: 900; letter-spacing: .06em; white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  #camera, .uf, .trilho i, .mapa, .demo-faixa, .cartao { transition: none; }
+  .pill[data-estado="apuracao"] .ponto, .placar.entrando > * { animation: none; }
+}
