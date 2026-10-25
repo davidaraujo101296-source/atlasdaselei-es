@@ -104,6 +104,60 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 
 **Ainda dependem de consulta externa pelo navegador:** governador, senador e deputados (2022 e 2026) e prefeito e vereador (2024). Esses cargos não foram migrados. Os arquivos JSON de divulgação de 2022 no `resultados.tse.jus.br` respondem 404 desde a verificação de 23/10/2026; para governador e senador de 2022, o site usa o CSV compilado pelo NOPolitica.
 
+## Contador de audiência (desligado por padrão)
+
+`audiencia.js` mostra, perto da navegação, quantas pessoas estão online agora, os visitantes e as visualizações do dia, o pico de simultâneos e o tempo de permanência. Os dados vêm de `/api/audiencia`, que guarda tudo num Redis gerenciado (Upstash) compartilhado entre as instâncias. Sem o serviço configurado, o painel mostra **"Estatísticas indisponíveis"**, nunca zero. A transmissão do OBS (`transmissao.html`) não carrega o contador.
+
+**Definições:**
+- **Online:** navegador com página aberta e visível que enviou sinal nos últimos 7 minutos. O carregamento da página já conta como sinal (o visitante novo aparece na hora) e, depois, uma aba visível por navegador envia presença a cada 3 minutos.
+- **Visitantes:** identificadores anônimos distintos do dia, renovados diariamente.
+- **Visualizações:** carregamentos de página.
+- **Pico:** maior número de simultâneos registrado no dia.
+- **Permanência:** soma estimada do tempo de páginas visíveis.
+- Com muitos acessos, só uma fração dos navegadores envia sinais e os números aparecem como estimativa (≈).
+
+**Para ligar (ação humana):**
+1. Na Vercel: projeto → **Storage** → **Upstash for Redis** → plano **Free** → conectar ao projeto. Isso cria as variáveis `KV_REST_API_URL` e `KV_REST_API_TOKEN`.
+2. Em **Settings → Environment Variables** (Production): `AUDIENCIA_ATIVA=1` e, de preferência, `AUDIENCIA_SEGREDO` com um texto aleatório longo.
+3. Publicar de novo, com um novo deploy.
+
+**Para desligar sem derrubar o site:**
+- **Imediato:** no console do Upstash, `SET aud:desligado 1`. Em até ~2 minutos o painel passa a "Estatísticas indisponíveis" e os navegadores param de enviar. Para religar, `DEL aud:desligado`.
+- **Completo:** remover `AUDIENCIA_ATIVA` e publicar.
+- **Corte absoluto de execuções:** no Firewall da Vercel, uma regra **Deny** para `POST /api/audiencia`. É bloqueada no edge, sem executar a função. Nada no código consegue garantir isso sozinho.
+
+**O que o código garante:**
+- **Comandos Redis:** todo comando é contabilizado (`aud:cmd:<mês>` e `aud:cmd:<dia>`), inclusive os de sinais rejeitados. Ao atingir 450 mil/mês ou 220 mil/dia (o Upstash Free tem 500 mil/mês), a instância não envia comando nenhum por 5 minutos e depois reconfere com 3 comandos. O excesso possível vem só das requisições em andamento no instante do corte e dessas reconferências (nos testes, 57 comandos em 1,5 h).
+- **Escritas por minuto:** teto global de 120; acima dele, nada é gravado.
+- **Redis fora do ar:** a instância para de chamá-lo por 60 s (timeout de 1,5 s). A apuração não depende do contador.
+
+**O que NÃO é garantido (é só reduzido):** o número de execuções da função na Vercel. Cada POST que chega é uma execução, mesmo quando rejeitado. Isso é reduzido por:
+- amostragem decidida no servidor (100%, 20%, 5% ou 1% dos navegadores, buscando ~40 escritas/min);
+- cabeçalho `X-Audiencia-Coleta: 0`, que faz o navegador parar de enviar por 10 minutos;
+- leitura cacheada no CDN (30 s, ou 120 s com a coleta fechada).
+
+Um cliente malicioso que ignore o navegador pode gerar execuções à vontade; nesse caso, os comandos Redis continuam limitados, mas as execuções só param com a regra Deny.
+
+**Outras proteções:**
+- limite por IP (só um hash diário com segredo; o IP nunca é gravado);
+- um sinal de presença por visitante por minuto, no máximo 6 carregamentos por minuto e filtro de robôs;
+- só aceita sinais da própria origem, com corpo de até 512 bytes.
+
+**Consumo estimado** (`node scripts/audiencia/simular-consumo.cjs`, Redis em memória; são estimativas, não garantias):
+
+| Cenário | Execuções da função | Comandos Redis |
+|---|---|---|
+| 50 simultâneos, 1 h | ~1 mil | ~16 mil |
+| 500 simultâneos, 1 h | ~2,3 mil | ~31 mil |
+| 5.000 simultâneos, 1 h | ~2,2 mil | ~23 mil |
+| 20.000 simultâneos, 1 h (chegando em 3 min) | ~7,1 mil | ~80 mil |
+| 2.000 simultâneos por 6 h | ~9 mil | ~136 mil |
+| 10.000 simultâneos por 6 h | ~14 mil | ~205 mil |
+
+Com amostragem, o "online" é uma estimativa (≈); nas simulações ele variou de −10% a +30% do valor real.
+
+Todos os limites podem ser ajustados pelas variáveis `AUDIENCIA_*` (ver `lib/audiencia.js`).
+
 ## Comparador eleitoral
 
 `comparar.html` compara dois resultados presidenciais oficiais (2018 1º/2º, 2022 1º/2º e 2026 1º turno) no Brasil ou numa UF, com dois mapas sincronizados, participação (comparecimento, abstenção, válidos, brancos e nulos) e candidaturas. Usa apenas os arquivos de `dados/historico/`, sem consultar o TSE nem APIs. A mesma pessoa é reconhecida pelo nome civil completo, mesmo com número ou partido diferentes. Diferenças em p.p. só aparecem entre cenários do mesmo turno. O 2º turno de 2026 não entra nesta versão. O teste de tela fica em `tests/e2e/comparar.e2e.cjs`.
