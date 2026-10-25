@@ -42,7 +42,25 @@
     respostasAntigasIgnoradas: 0,
     versao: 0,
   };
-  let fonte = null, inicioApuracao = C.INICIO, diretor = null, mapa = null;
+  let fonte = null, inicioApuracao = C.INICIO, diretor = null, mapa = null, cartoes = null;
+
+  // Início do ciclo de 11 min dos cards. Modo real: continua de onde estava se a página
+  // for recarregada no mesmo dia (a sequência de mensagens não volta ao começo).
+  // Demonstração: começa no carregamento; ?cartoesInicio=SEG simula um ponto do ciclo.
+  const CHAVE_CARTOES = 'atlas-transmissao-cartoes-inicio';
+  function inicioDosCartoes() {
+    const agora = Date.now();
+    if (DEMO) {
+      const s = Number(params.get('cartoesInicio'));
+      return agora - (Number.isFinite(s) && s > 0 && s < 660 ? s * 1000 : 0);
+    }
+    try {
+      const salvo = Number(localStorage.getItem(CHAVE_CARTOES));
+      if (salvo > 0 && salvo <= agora && agora - salvo < 24 * 3600e3) return salvo;
+      localStorage.setItem(CHAVE_CARTOES, String(agora));
+    } catch (e) { /* armazenamento indisponível: ciclo começa no carregamento */ }
+    return agora;
+  }
 
   // ---------- fontes de dados ----------
   async function obter(url, limiteMs) {
@@ -365,13 +383,18 @@
       restaurar();
     }
     diretor = new C.Diretor(config, Date.now());
+    // Cards de divulgação (doação e compartilhamento), independentes do diretor de cenas.
+    // ?cartoes=desligado desativa sem precisar de deploy.
+    if (window.TransmissaoCartoes && params.get('cartoes') !== 'desligado') {
+      cartoes = window.TransmissaoCartoes.iniciar({ painel: document.querySelector('.painel-mapa'), inicioMs: inicioDosCartoes() });
+    }
     try { await montarMapa(); } catch (e) { $('mapa-nota').hidden = false; $('mapa-nota').textContent = 'Mapa indisponível; resultados seguem no placar.'; }
     quadro();
     setInterval(quadro, 250);
     cicloNacional();
     cicloMapa(false);
     // Exposto para conferência no console e nos testes automatizados.
-    window.__transmissao = { estado, config, get cena() { return diretor.cena; }, get fila() { return diretor.fila.slice(); }, demo: DEMO };
+    window.__transmissao = { estado, config, get cena() { return diretor.cena; }, get fila() { return diretor.fila.slice(); }, demo: DEMO, get cartoes() { return cartoes && cartoes.situacao; } };
   }
   iniciar();
 })();
