@@ -27,40 +27,39 @@ Os cards dividem o bloco do mapa (o mapa encolhe), sem cobrir números. Com o av
 
 As margens laterais são de 64 px. O **TikTok** tem botões na lateral direita que podem encostar no card do candidato à direita; ajustar antes de usar lá.
 
-## OBS neste computador (25/10/2026)
+## OBS neste computador (configurado em 25/10/2026)
 
-- **OBS:** 33.0.0, perfil "Atlas Eleitoral", saída de 1920x1080 a 30 FPS, NVENC H.264 a 6.000 kbps para o YouTube.
-- **GPU:** RTX 4050 Laptop, com NVENC H.264, HEVC e AV1. Na transmissão horizontal, o codificador ficou entre ~20% e 55% de uso.
-- **Plugin Aitum Vertical:** **não instalado**. Nada foi instalado nem alterado.
-- **Rede:** só Wi-Fi 5 GHz, sem cabo. A live de teste a 6 Mbps perdeu 0,1% dos quadros. A velocidade de **upload não foi medida**.
+- **OBS:** 33.0.0. A horizontal não mudou: 1920x1080 a 30 FPS, NVENC H.264 a 6.000 kbps para o YouTube.
+- **Aitum Vertical 1.6.6:** instalado a partir do pacote oficial (`windows-programdata.zip`, hash SHA-256 conferido, DLL assinada pela Aitum Ltd) em `C:ProgramDataobs-studiopluginsertical-canvas`. Carregou no OBS 33 sem erros.
+- **Canvas vertical:** 1080x1920 a 30 FPS, com as cenas "ATLAS VERTICAL — TRANSMISSÃO REAL" (`transmissao-vertical.html`) e "ATLAS VERTICAL — DEMONSTRAÇÃO" (`?demo=1`).
+- **Destinos verticais:** "Instagram" e "Facebook" (servidor `rtmps://live-api-s.facebook.com:443/rtmp/`), **desligados e sem chave**. O Backtrack (replay contínuo) foi desligado.
+- **Upload medido:** 101–130 Mbps no teste da Cloudflare, por Wi-Fi 5 GHz.
 
-## Plano de conexão
+## Medições (gravação simultânea horizontal + vertical, sem transmitir)
 
-### Opção recomendada: Aitum Vertical (gratuito, código aberto)
-
-1. Instalar o plugin depois de conferir, na página oficial da Aitum, a versão compatível com o OBS 33.0.0.
-2. No canvas vertical (1080x1920), criar a cena "ATLAS VERTICAL — REAL" com uma fonte Navegador de 1080x1920 e 30 FPS, apontando para `transmissao-vertical.html`, com as mesmas opções da horizontal.
-3. Adicionar duas saídas de transmissão no canvas vertical, Instagram e Facebook, com o servidor RTMPS e a chave de cada uma. A cena horizontal e a saída do YouTube continuam como estão.
-
-### Alternativa sem plugin
-
-Abrir uma segunda instância do OBS (atalho com `--multi`), com um perfil vertical de 1080x1920. Ela gasta mais memória: são dois OBS e dois navegadores incorporados.
-
-## Estimativa de consumo (não medida com as três saídas juntas)
-
-| Item | Estimativa |
+| Item | Resultado |
 |---|---|
-| Codificações | 1 horizontal + até 2 verticais = até **3 sessões NVENC**. A placa aceita várias sessões simultâneas; o limite prático é a carga do codificador. |
-| Codificador da GPU | 60–100% com três saídas em 1080p30. **Risco de perder quadros.** Para aliviar: vertical em 720x1280, preset p4 e 3.500–4.500 kbps. |
-| GPU (renderização) | +10–15% para a segunda página animada |
-| CPU | Baixo; o OBS usou 1–3% |
-| Upload | YouTube 6 + Instagram ~4 + Facebook ~4 + áudio ≈ **14–15 Mbps**. Com margem, é preciso **≥ 20 Mbps de upload estável**. |
+| Quadros perdidos | 0 (renderização e saída) |
+| FPS | 30 fixos |
+| Renderização | média de 1,19 ms, máximo de 1,76 ms |
+| Codificador NVENC | 38–46% com duas codificações |
+| GPU | 8–26%, 1,5–1,8 GB de memória, 58 °C |
+| CPU | OBS 1–2,5%; sistema 8–38% |
+
+**Codificações:** os dois destinos verticais **compartilham um único codificador**. Isso foi confirmado no log com dois destinos locais: `vertical_canvas_video_encoder` foi criado uma vez só (NVENC CBR, 4.500 kbps, 1080x1920). O total fica em **2 codificações**: YouTube + vertical.
+
+**Taxas recomendadas:**
+- YouTube: 6.000 kbps.
+- Vertical (Instagram + Facebook): 4.500 kbps.
+- Upload total: ~15,5 Mbps, folgado.
+
+Se o Instagram recusar 1080x1920 (os guias citam 720x1280), defina 720x1280 só nesse destino. Isso cria uma terceira codificação, e o NVENC tem folga para ela.
 
 ## Plataformas
 
 - **Instagram:** transmissão por chave só pelo **Live Producer** (instagram.com no computador → Criar → Ao vivo), em conta profissional elegível. A chave vale para uma live e expira.
 - **Facebook:** Live Producer, que aceita vídeo vertical, com chave persistente ou por evento.
-- **Valores das plataformas:** resolução, taxa e intervalo de quadro-chave devem ser conferidos no Live Producer de cada uma no momento da configuração. **Não foram verificados aqui.**
+- **Valores das plataformas:** guias de terceiros indicam, para o Instagram, 720x1280, 2.250–6.000 kbps e áudio estéreo em 44,1 kHz. O OBS usa 48 kHz. **Confirmar na live privada de teste.**
 - **Áudio:** as duas plataformas exigem uma trilha AAC. O OBS envia uma trilha silenciosa mesmo sem fontes de áudio. Microfone e áudio do computador continuam desligados.
 - **Quedas de conexão:** cada saída reconecta sozinha e uma queda não derruba as outras. Ainda assim, o comportamento do Instagram e do Facebook depois de uma queda longa **precisa ser testado**.
 
