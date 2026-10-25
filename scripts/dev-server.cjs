@@ -19,7 +19,7 @@ const pages = new Map([
     .map(file => ['/' + file, file]),
   // Página de transmissão (OBS). Os dados vêm das APIs públicas da Vercel, não destes handlers.
   ...['transmissao.html', 'transmissao.css', 'transmissao.js', 'transmissao-core.js', 'transmissao-demo.js', 'assets/transmissao-estados.json',
-    'transmissao-cartoes.js', 'assets/pix-qr.svg', 'assets/site-qr.svg']
+    'transmissao-cartoes.js', 'assets/pix-qr.svg', 'assets/site-qr.svg', 'transmissao-vertical.html', 'transmissao-vertical.css', 'favicon.svg']
     .map(file => ['/' + file, file]),
   ['/brasil-editorial.css', 'brasil-editorial.css'],
   ...['brasil-aquarela.webp', 'brasilia-aquarela.webp', 'rio-aquarela.webp', 'cidades-aquarela.webp']

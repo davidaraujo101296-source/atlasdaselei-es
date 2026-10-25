@@ -353,9 +353,11 @@
     atualizarMoldura();
   }
 
-  // Escala a tela de 1920x1080 para caber em janelas de pré-visualização menores.
+  // Escala a tela (1920x1080 na horizontal; a vertical declara 1080x1920 em data-largura e
+  // data-altura) para caber em janelas de pré-visualização menores.
   function ajustarEscala() {
-    const k = Math.min(innerWidth / 1920, innerHeight / 1080);
+    const tela = $('tela'), largura = Number(tela.dataset.largura) || 1920, altura = Number(tela.dataset.altura) || 1080;
+    const k = Math.min(innerWidth / largura, innerHeight / altura);
     $('tela').style.transform = k < 1 ? `scale(${k})` : '';
   }
 

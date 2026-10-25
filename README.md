@@ -171,6 +171,11 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 
 O endereço exibido no rodapé é `www.atlaseleitoral.org`. As consultas técnicas continuam na URL canônica da Vercel. O título, a descrição e a mensagem fixada para a live estão em `docs/youtube-live.txt`.
 
+**Versão vertical (Instagram e Facebook):** `transmissao-vertical.html` (1080x1920) usa o mesmo motor, os mesmos dados e os mesmos cards da horizontal, com composição própria para celular (`transmissao-vertical.css`).
+- `?guias=1` mostra as áreas cobertas pelas plataformas, só para ensaio.
+- O teste de tela está em `tests/e2e/vertical.e2e.cjs`.
+- O plano de OBS e plataformas está em `docs/transmissao-vertical.md`.
+
 **Comportamento:**
 - **Antes das 17h:** "Aguardando divulgação oficial", com contagem regressiva e sem números.
 - **Com votos:** a visão nacional dura ~20 s e o estado em destaque ~15 s, com aproximação suave no mapa.
