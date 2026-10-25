@@ -2,7 +2,7 @@
 // GET  /api/audiencia  → métricas do dia (cache de 30 s no CDN; nunca inventa números)
 // POST /api/audiencia  → sinal anônimo { tipo: 'pv' | 'hb', vid, passo } (sempre 204)
 // Totalmente separado das APIs de apuração: falhas aqui não afetam /api/apuracao nem /api/mapa.
-const { configuracao, armazenamentoUpstash, criar } = require('../lib/audiencia');
+const { configuracao, armazenamentoUpstash, criar, PARAR } = require('../lib/audiencia');
 
 let instancia = null;
 function audiencia(cfg) {
@@ -44,15 +44,22 @@ async function handler(req, res, ambiente = process.env, agora = Date.now) {
   const cfg = configuracao(ambiente);
   if (req.method === 'GET') {
     if (!cfg.ativo) return responder(res, 200, { ok: true, disponivel: false, motivo: 'desativado' }, 300);
-    try { return responder(res, 200, await audiencia(cfg).ler(agora()), 30); }
-    catch (e) { return responder(res, 200, { ok: true, disponivel: false, motivo: 'servico-indisponivel' }, 30); }
+    try {
+      const dados = await audiencia(cfg).ler(agora());
+      // Coleta fechada: cache mais longo para os navegadores pararem de enviar logo.
+      return responder(res, 200, dados, dados.coleta ? 30 : 120);
+    } catch (e) { return responder(res, 200, { ok: true, disponivel: false, motivo: 'servico-indisponivel' }, 60); }
   }
   if (req.method === 'POST') {
-    if (!cfg.ativo) return responder(res, 204);
-    try {
-      const evento = await lerCorpo(req);
-      await audiencia(cfg).registrar({ tipo: evento.tipo, vid: evento.vid, passo: evento.passo }, contexto(req), agora());
-    } catch (e) { /* sinal descartado: nunca derruba a página nem expõe detalhes */ }
+    let status = 'desativado';
+    if (cfg.ativo) {
+      try {
+        const evento = await lerCorpo(req);
+        status = await audiencia(cfg).registrar({ tipo: evento.tipo, vid: evento.vid, passo: evento.passo }, contexto(req), agora());
+      } catch (e) { status = 'indisponivel'; /* sinal descartado: nunca derruba a página */ }
+    }
+    // Instrui o navegador a parar de enviar nesta página (amostra, limite, desligado, falha).
+    res.setHeader('X-Audiencia-Coleta', status === 'desativado' || PARAR.has(status) ? '0' : '1');
     return responder(res, 204);
   }
   res.setHeader('Allow', 'GET, POST');

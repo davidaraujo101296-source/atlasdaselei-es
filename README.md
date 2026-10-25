@@ -109,7 +109,7 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 `audiencia.js` mostra, perto da navegação, quantas pessoas estão online agora, os visitantes e as visualizações do dia, o pico de simultâneos e o tempo de permanência. Os dados vêm de `/api/audiencia`, que guarda tudo num Redis gerenciado (Upstash) compartilhado entre as instâncias. Sem o serviço configurado, o painel mostra **"Estatísticas indisponíveis"**, nunca zero. A transmissão do OBS (`transmissao.html`) não carrega o contador.
 
 **Definições:**
-- **Online:** navegador com página aberta e visível que enviou sinal nos últimos 7 minutos. Só uma aba por navegador envia.
+- **Online:** navegador com página aberta e visível que enviou sinal nos últimos 7 minutos. O carregamento da página já conta como sinal (o visitante novo aparece na hora) e, depois, uma aba visível por navegador envia presença a cada 3 minutos.
 - **Visitantes:** identificadores anônimos distintos do dia, renovados diariamente.
 - **Visualizações:** carregamentos de página.
 - **Pico:** maior número de simultâneos registrado no dia.
@@ -122,15 +122,39 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 3. Publicar de novo, com um novo deploy.
 
 **Para desligar sem derrubar o site:**
-- **Imediato:** no console do Upstash, `SET aud:desligado 1`. A coleta para em 1 a 2 minutos e as leituras continuam. Para religar, `DEL aud:desligado`.
+- **Imediato:** no console do Upstash, `SET aud:desligado 1`. Em até ~2 minutos o painel passa a "Estatísticas indisponíveis" e os navegadores param de enviar. Para religar, `DEL aud:desligado`.
 - **Completo:** remover `AUDIENCIA_ATIVA` e publicar.
+- **Corte absoluto de execuções:** no Firewall da Vercel, uma regra **Deny** para `POST /api/audiencia`. É bloqueada no edge, sem executar a função. Nada no código consegue garantir isso sozinho.
 
-**Proteções:**
-- orçamentos de escritas (25 mil/dia e 60 mil/mês) e de comandos Redis (400 mil/mês, abaixo dos 500 mil gratuitos);
+**O que o código garante:**
+- **Comandos Redis:** todo comando é contabilizado (`aud:cmd:<mês>` e `aud:cmd:<dia>`), inclusive os de sinais rejeitados. Ao atingir 450 mil/mês ou 220 mil/dia (o Upstash Free tem 500 mil/mês), a instância não envia comando nenhum por 5 minutos e depois reconfere com 3 comandos. O excesso possível vem só das requisições em andamento no instante do corte e dessas reconferências (nos testes, 57 comandos em 1,5 h).
+- **Escritas por minuto:** teto global de 120; acima dele, nada é gravado.
+- **Redis fora do ar:** a instância para de chamá-lo por 60 s (timeout de 1,5 s). A apuração não depende do contador.
+
+**O que NÃO é garantido (é só reduzido):** o número de execuções da função na Vercel. Cada POST que chega é uma execução, mesmo quando rejeitado. Isso é reduzido por:
+- amostragem decidida no servidor (100%, 20%, 5% ou 1% dos navegadores, buscando ~40 escritas/min);
+- cabeçalho `X-Audiencia-Coleta: 0`, que faz o navegador parar de enviar por 10 minutos;
+- leitura cacheada no CDN (30 s, ou 120 s com a coleta fechada).
+
+Um cliente malicioso que ignore o navegador pode gerar execuções à vontade; nesse caso, os comandos Redis continuam limitados, mas as execuções só param com a regra Deny.
+
+**Outras proteções:**
 - limite por IP (só um hash diário com segredo; o IP nunca é gravado);
-- um sinal de presença por visitante por minuto e filtro de robôs;
-- só aceita sinais da própria origem;
-- leitura cacheada por 30 s no CDN e amostragem adaptativa.
+- um sinal de presença por visitante por minuto, no máximo 6 carregamentos por minuto e filtro de robôs;
+- só aceita sinais da própria origem, com corpo de até 512 bytes.
+
+**Consumo estimado** (`node scripts/audiencia/simular-consumo.cjs`, Redis em memória; são estimativas, não garantias):
+
+| Cenário | Execuções da função | Comandos Redis |
+|---|---|---|
+| 50 simultâneos, 1 h | ~1 mil | ~16 mil |
+| 500 simultâneos, 1 h | ~2,3 mil | ~31 mil |
+| 5.000 simultâneos, 1 h | ~2,2 mil | ~23 mil |
+| 20.000 simultâneos, 1 h (chegando em 3 min) | ~7,1 mil | ~80 mil |
+| 2.000 simultâneos por 6 h | ~9 mil | ~136 mil |
+| 10.000 simultâneos por 6 h | ~14 mil | ~205 mil |
+
+Com amostragem, o "online" é uma estimativa (≈); nas simulações ele variou de −10% a +30% do valor real.
 
 Todos os limites podem ser ajustados pelas variáveis `AUDIENCIA_*` (ver `lib/audiencia.js`).
 

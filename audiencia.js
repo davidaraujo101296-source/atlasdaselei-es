@@ -1,15 +1,18 @@
 /* Contador de audiência do Atlas (anônimo). Lê métricas de /api/audiencia (cache no CDN)
    e, se a coleta estiver ativa e este navegador estiver na amostra, envia:
-   - 'pv' uma vez por carregamento de página visível;
+   - 'pv' uma vez por carregamento de página visível (já marca o visitante como online);
    - 'hb' a cada intervalo, só com a página visível e só por uma aba do navegador.
+   Se o servidor responder X-Audiencia-Coleta: 0 (fora da amostra, limite, desligado ou
+   falha), esta página para de enviar por 10 minutos.
    Sem dados confirmados, mostra "Estatísticas indisponíveis" — nunca zero inventado. */
 (() => {
   'use strict';
-  const PASSOS = [1, 0.25, 0.05];
+  const PASSOS = [1, 0.2, 0.05, 0.01];
+  const MAX_HB_POR_PAGINA = 80; // ~4 h de presença; depois a página para de sinalizar
   const CHAVE_ID = 'atlas-aud-id', CHAVE_LIDER = 'atlas-aud-lider';
   const fmt = n => new Intl.NumberFormat('pt-BR').format(n);
   const aba = Math.random().toString(36).slice(2);
-  let dados = null, timerHb = null, pvEnviado = false;
+  let dados = null, timerHb = null, pvEnviado = false, pausaAte = 0, hbEnviados = 0;
 
   // Identificador anônimo do navegador, renovado a cada dia (sem cookie, sem IP).
   function idDoDia() {
@@ -32,10 +35,15 @@
   }
   const participa = () => !!dados && dados.coleta && fracaoDoId() < PASSOS[dados.passo];
 
-  // Uma aba por navegador envia presença. A liderança dura 90 s e é renovada a cada 30 s,
-  // bem mais que o intervalo entre sinais, para outra aba não assumir entre dois sinais.
+  // Uma aba visível por navegador envia presença. A liderança dura 90 s e é renovada a cada
+  // 30 s; aba que vai para segundo plano libera a liderança para outra aba visível.
   let lider = false;
+  function liberarLideranca() {
+    try { const l = JSON.parse(localStorage.getItem(CHAVE_LIDER) || 'null'); if (l && l.aba === aba) localStorage.removeItem(CHAVE_LIDER); } catch (e) { /* nada */ }
+    lider = false;
+  }
   function disputarLideranca() {
+    if (document.visibilityState !== 'visible') { if (lider) liberarLideranca(); return; }
     try {
       const agora = Date.now(), l = JSON.parse(localStorage.getItem(CHAVE_LIDER) || 'null');
       lider = !l || l.ate < agora || l.aba === aba;
@@ -44,8 +52,11 @@
   }
 
   function enviar(tipo) {
-    if (!participa() || document.visibilityState !== 'visible') return;
-    fetch('/api/audiencia', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true, credentials: 'same-origin', body: JSON.stringify({ tipo, vid, passo: dados.passo }) }).catch(() => {});
+    if (!participa() || document.visibilityState !== 'visible' || Date.now() < pausaAte) return;
+    if (tipo === 'hb' && ++hbEnviados > MAX_HB_POR_PAGINA) return;
+    fetch('/api/audiencia', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true, credentials: 'same-origin', body: JSON.stringify({ tipo, vid, passo: dados.passo }) })
+      .then(r => { if (r.headers.get('X-Audiencia-Coleta') === '0') pausaAte = Date.now() + 600000; })
+      .catch(() => { pausaAte = Date.now() + 600000; });
   }
 
   // ---------- painel ----------
@@ -94,8 +105,9 @@
   setInterval(disputarLideranca, 30000);
   atualizar(); // o painel só aparece depois da primeira leitura
   setInterval(atualizar, 60000);
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') atualizar(); });
-  addEventListener('pagehide', () => {
-    try { const l = JSON.parse(localStorage.getItem(CHAVE_LIDER) || 'null'); if (l && l.aba === aba) localStorage.removeItem(CHAVE_LIDER); } catch (e) { /* nada */ }
+  document.addEventListener('visibilitychange', () => {
+    disputarLideranca(); // oculta: libera; visível: pode assumir
+    if (document.visibilityState === 'visible') atualizar();
   });
+  addEventListener('pagehide', liberarLideranca);
 })();
