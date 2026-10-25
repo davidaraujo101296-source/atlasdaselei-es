@@ -14,6 +14,9 @@ const pages = new Map([
   ['/styles.css', 'styles.css'], ['/live-status.js', 'live-status.js'], ['/robots.txt', 'robots.txt'],
   ['/election-cards.js', 'election-cards.js'],
   ...['comparar.html', 'comparar.css', 'comparar.js', 'comparar-core.js'].map(file => ['/' + file, file]),
+  // Apoio e compartilhamento.
+  ...['apoiar.html', 'apoiar.css', 'apoio.css', 'apoio.js', 'apoio-core.js', 'pix.js', 'assets/pix-qr.svg', 'assets/og-atlas.jpg']
+    .map(file => ['/' + file, file]),
   // Página de transmissão (OBS). Os dados vêm das APIs públicas da Vercel, não destes handlers.
   ...['transmissao.html', 'transmissao.css', 'transmissao.js', 'transmissao-core.js', 'transmissao-demo.js', 'assets/transmissao-estados.json',
     'transmissao-cartoes.js', 'assets/pix-qr.svg', 'assets/site-qr.svg']
@@ -45,7 +48,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(405, { Allow: 'GET, HEAD' }); res.end(); return;
     }
     const body = await fs.readFile(path.join(root, file));
-    const type = file.endsWith('.webp') ? 'image/webp' : file.endsWith('.svg') ? 'image/svg+xml' : file.endsWith('.css') ? 'text/css' : file.endsWith('.html') ? 'text/html' : file.endsWith('.js') ? 'text/javascript' : file.endsWith('.json') ? 'application/json' : 'text/plain';
+    const type = file.endsWith('.jpg') ? 'image/jpeg' : file.endsWith('.webp') ? 'image/webp' : file.endsWith('.svg') ? 'image/svg+xml' : file.endsWith('.css') ? 'text/css' : file.endsWith('.html') ? 'text/html' : file.endsWith('.js') ? 'text/javascript' : file.endsWith('.json') ? 'application/json' : 'text/plain';
     res.writeHead(200, { 'Content-Type': type + '; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end(req.method === 'HEAD' ? undefined : body);
   } catch (error) {

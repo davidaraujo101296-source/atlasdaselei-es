@@ -1,0 +1,62 @@
+/* Página de apoio: leitura editorial em coluna, área do Pix em destaque. */
+.apoio-page { position: relative; isolation: isolate; }
+.apoio-page::before { content: ""; position: absolute; z-index: -1; pointer-events: none; top: 86px; left: calc(-1 * var(--page-gutter)); width: calc(100% + var(--page-gutter) * 2); height: 420px; background: url('assets/brasil-aquarela.webp') center top / cover no-repeat; opacity: .35; mask-image: linear-gradient(#000 20%, transparent); }
+.apoio { max-width: 760px; margin: 0 auto; padding: 56px 0 8px; }
+.apoio p { margin: 0 0 14px; font-size: 18px; line-height: 1.7; color: #24414a; }
+.apoio h2 { margin: 0 0 18px; font: 700 clamp(26px, 3vw, 34px)/1.15 Georgia, "Times New Roman", serif; letter-spacing: -.04em; color: var(--ink); }
+.apoio-abertura { padding-bottom: 36px; }
+.apoio-abertura .eyebrow::before { content: ""; display: inline-block; width: 22px; height: 3px; margin-right: 10px; vertical-align: middle; background: var(--gold); }
+.apoio-abertura h1 { margin: 18px 0 22px; font: 700 clamp(38px, 5vw, 58px)/1.05 Georgia, "Times New Roman", serif; letter-spacing: -.06em; }
+.apoio .apoio-lead { font-size: 21px; color: var(--ink); }
+.apoio-atalho { display: inline-flex; align-items: center; gap: 10px; min-height: 46px; margin-top: 8px; padding: 10px 18px; border-radius: 9px; background: var(--green); color: #fff; font-size: 14px; font-weight: 700; }
+.apoio-atalho:hover { background: #064a3b; text-decoration: none; }
+.apoio-bloco { padding: 34px 0; border-top: 1px solid #e3e6dc; }
+.apoio .apoio-destaque { padding-left: 16px; border-left: 4px solid var(--gold); color: var(--ink); font-weight: 600; }
+
+/* Evolução do projeto (etapas reais do Atlas) */
+.apoio-linha { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 8px 0 24px; padding: 0; }
+.apoio-linha li { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 1px solid #e3e6dc; border-radius: 12px; background: #fffefb; box-shadow: 0 3px 12px #142f3507; }
+.apoio-passo { display: grid; place-items: center; flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: #e7efe6; color: var(--green); font-weight: 800; font-size: 13px; }
+.apoio-linha li:nth-child(3n+2) .apoio-passo { background: #fff3cf; color: #6b5310; }
+.apoio-linha li:nth-child(3n) .apoio-passo { background: #e3f0f6; color: #08597b; }
+.apoio-linha strong { display: block; font-size: 14px; line-height: 1.3; }
+.apoio-linha small { display: block; margin-top: 3px; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+
+/* Contribuição */
+.apoio-pix { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 28px 34px; align-items: center; margin: 10px -40px 34px; padding: 30px 40px; border: 1px solid #d5dfd2; border-top: 5px solid var(--gold); border-radius: 18px; background: #fffefb; box-shadow: 0 14px 40px #183e3014; scroll-margin-top: 20px; }
+.apoio-qr { margin: 0; text-align: center; }
+.apoio-qr img { display: block; width: 260px; height: 260px; padding: 8px; border: 1px solid #e3e6dc; border-radius: 14px; background: #fff; }
+.apoio-qr figcaption { max-width: 260px; margin-top: 10px; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+.apoio-pix-info h2 { margin: 8px 0 14px; }
+.apoio .apoio-chave-rotulo { margin: 0 0 4px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.apoio .apoio-chave { margin: 0 0 16px; }
+.apoio-chave code { display: inline-block; max-width: 100%; padding: 8px 12px; border-radius: 8px; background: #f0f3e9; color: var(--ink); font: 700 17px/1.3 "Segoe UI", system-ui, sans-serif; overflow-wrap: anywhere; user-select: all; }
+.apoio-pix .aa-status { margin-top: 10px; }
+.apoio .apoio-voluntaria { margin: 16px 0 4px; font-size: 16px; font-weight: 700; color: var(--green); }
+.apoio .apoio-nota { margin: 0; font-size: 13px; color: var(--muted); }
+
+.apoio-partilha .aa-acoes { margin-top: 18px; }
+.apoio-partilha .aa-status { margin-top: 10px; }
+.apoio-assinatura { padding: 34px 0 10px; border-top: 1px solid #e3e6dc; }
+.apoio .apoio-nome { margin-top: 18px; font: 700 26px/1.2 Georgia, "Times New Roman", serif; color: var(--ink); letter-spacing: -.03em; }
+.apoio-nome small { display: block; margin-top: 4px; font: 600 13px/1.4 "Segoe UI", system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.apoio-voltar { display: inline-block; margin-top: 18px; font-size: 14px; font-weight: 700; }
+.apoio-rodape { justify-content: center; text-align: center; }
+.apoio-rodape p { max-width: 760px; margin: 0 auto; font-size: 13px; line-height: 1.6; }
+
+@media (max-width: 900px) {
+  .apoio-pix { margin-left: 0; margin-right: 0; padding: 24px; }
+}
+@media (max-width: 700px) {
+  .apoio { padding-top: 30px; }
+  .apoio p { font-size: 16.5px; }
+  .apoio .apoio-lead { font-size: 18.5px; }
+  .apoio-linha { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .apoio-pix { grid-template-columns: minmax(0, 1fr); justify-items: center; padding: 22px 18px; text-align: left; }
+  .apoio-pix-info { width: 100%; }
+  .apoio-pix .aa-acoes .aa-btn, .apoio-partilha .aa-btn { flex: 1 1 100%; }
+  .apoio-qr img { width: min(260px, 70vw); height: auto; }
+}
+@media (max-width: 380px) {
+  .apoio-linha { grid-template-columns: minmax(0, 1fr); }
+}
