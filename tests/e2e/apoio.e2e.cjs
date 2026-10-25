@@ -140,10 +140,11 @@ async function main() {
     const ctx = await contexto({ width: 1200, height: 800 });
     const a = await ctx.newPage(); await a.goto(BASE + '/');
     const b = await ctx.newPage(); await b.goto(BASE + '/comparar.html');
-    await a.clock.runFor(120000);
+    // Um segundo simulado por vez, com uma pausa real curta: como no uso real, o localStorage
+    // tem tempo de sincronizar entre as abas (runFor de 2 min de uma vez é mais rápido que isso).
+    for (let s = 0; s < 120; s++) { await a.clock.runFor(1000); await a.waitForTimeout(15); }
     const e = await estado(a);
-    // O localStorage entre abas sincroniza com pequeno atraso: pode contar um pouco menos, nunca em dobro.
-    assert.ok(e.ativoMs >= 100000 && e.ativoMs <= 125000, 'tempo ativo ≈ 2 min com duas abas (nunca 4): ' + e.ativoMs);
+    assert.ok(e.ativoMs >= 110000 && e.ativoMs <= 125000, 'tempo ativo ≈ 2 min com duas abas (nunca 4): ' + e.ativoMs);
     await ctx.close();
   });
   await passo('"Não mostrar hoje" e "Quero apoiar" encerram os pedidos do ciclo', async () => {
