@@ -108,6 +108,31 @@ Cada arquivo traz, para o Brasil, cada UF e o exterior (`ZZ`): votos por candida
 
 `comparar.html` compara dois resultados presidenciais oficiais (2018 1º/2º, 2022 1º/2º e 2026 1º turno) no Brasil ou numa UF, com dois mapas sincronizados, participação (comparecimento, abstenção, válidos, brancos e nulos) e candidaturas. Usa apenas os arquivos de `dados/historico/`, sem consultar o TSE nem APIs. A mesma pessoa é reconhecida pelo nome civil completo, mesmo com número ou partido diferentes. Diferenças em p.p. só aparecem entre cenários do mesmo turno. O 2º turno de 2026 não entra nesta versão. O teste de tela fica em `tests/e2e/comparar.e2e.cjs`.
 
+## Apoio e compartilhamento
+
+- **`apoiar.html`:** a história do projeto, contada pelo criador, e a contribuição voluntária via Pix:
+  - QR Code (`assets/pix-qr.svg`);
+  - botões "Copiar código Pix (Copia e Cola)" e "Copiar chave Pix".
+- **Pix:**
+  - A chave é `atlaseleitoral.david@gmail.com`.
+  - O código Copia e Cola é um BR Code estático, sem valor, gerado por `pix.js`. O CRC16 é validado contra o exemplo oficial do Banco Central em `tests/apoio.test.js`.
+  - Recebedor: `DAVID DE ARAUJO LIMA`; cidade: `SAO PAULO`.
+  - Para gerar os QR Codes de novo: `npm install --no-save qrcode@1.5.4 && node scripts/apoio/gerar-qr.cjs`.
+  - **Antes de publicar, leia o QR com o app do banco e confira o nome do recebedor.**
+- **Pedidos de apoio (`apoio.js` + `apoio-core.js`):**
+  - Aparecem aos 3 min e aos 30 min de navegação ativa, contados só com uma página do Atlas visível e somados entre páginas, sem contar em dobro com várias abas.
+  - Cada um aparece no máximo uma vez a cada 24 h.
+  - Os pedidos param no ciclo se a pessoa escolher "Não mostrar pedidos de apoio hoje" ou clicar para apoiar.
+  - Fica só um registro local (`localStorage`, chave `atlas-apoio-v1`), sem cookies.
+  - Os pedidos não aparecem em `apoiar.html` nem na transmissão.
+- **Compartilhamento:**
+  - Um card "Ajude essa ideia a chegar mais longe!" fica logo abaixo do mapa e do placar (início, `atlas.html`, apuração e comparador).
+  - Ele oferece Web Share API, WhatsApp e cópia do link. Sem Web Share, abre um painel com WhatsApp e "Copiar link".
+  - No comparador, "Compartilhar esta comparação" envia o recorte atual (`?a=&b=&uf=`).
+  - No celular, um botão compacto "Compartilhar" some quando ficaria sobre o mapa ou o placar.
+- **Prévia de links:** Open Graph e Twitter Card em todas as páginas, com a imagem `assets/og-atlas.jpg` (1200x630). O endereço canônico é `https://www.atlaseleitoral.org`.
+- **Teste de tela com relógio simulado:** `tests/e2e/apoio.e2e.cjs`.
+
 ## Transmissão automática (OBS + YouTube)
 
 `transmissao.html` é uma tela de 1920x1080 para o OBS. Ela alterna sozinha entre a visão nacional, um estado em destaque e as novas parciais. Os dados vêm **sempre** das APIs públicas da Vercel (`/api/apuracao?cargo=presidente&uf=BR` e `/api/mapa`), nas URLs canônicas, mesmo com a página aberta em `127.0.0.1`. Ela não consulta o TSE diretamente.

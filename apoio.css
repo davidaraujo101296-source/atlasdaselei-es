@@ -1,0 +1,47 @@
+/* Apoio e compartilhamento: card perto dos resultados, pedidos de apoio, painel de
+   compartilhamento e botão compacto no celular. Mesma paleta e tipografia do Atlas. */
+.aa-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.aa-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px; border: 1px solid #aebdb4; border-radius: 9px; background: #fffefa; color: var(--ink); font-size: 13px; font-weight: 700; line-height: 1.2; text-align: center; transition: box-shadow .18s, background .18s; }
+.aa-btn:hover { text-decoration: none; box-shadow: 0 5px 16px #102d3616; }
+.aa-principal { background: var(--green); border-color: var(--green); color: #fff; }
+.aa-principal:hover { background: #064a3b; }
+.aa-texto { border-color: transparent; background: transparent; color: var(--muted); }
+.aa-texto:hover { box-shadow: none; background: #f0f3e9; }
+.aa-link { font-size: 13px; font-weight: 700; padding: 10px 4px; }
+.aa-status { flex-basis: 100%; margin: 0; font-size: 13px; font-weight: 700; color: var(--green); }
+.aa-status:empty { display: none; }
+
+/* Card de compartilhamento (integrado ao layout, sem sobrepor nada). */
+.aa-compartilhar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 28px; margin: 0 0 30px; padding: 18px 22px; border: 1px solid #d5dfd2; border-left: 4px solid var(--gold); border-radius: 0 12px 12px 0; background: #fffefa; box-shadow: 0 3px 12px #142f3507; }
+.aa-compartilhar-texto strong { display: block; font: 700 21px/1.2 Georgia, "Times New Roman", serif; letter-spacing: -.03em; }
+.aa-compartilhar-texto p { margin: 5px 0 0; max-width: 600px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+/* Painéis (pedido de apoio e alternativa de compartilhamento): não bloqueiam a página. */
+.aa-painel { position: fixed; z-index: 60; right: 24px; bottom: 24px; width: min(410px, calc(100vw - 24px)); max-height: calc(100vh - 48px); overflow: auto; padding: 22px 24px 16px; border: 1px solid #e3e6dc; border-top: 5px solid var(--gold); border-radius: 16px; background: #fffefb; box-shadow: 0 18px 48px #102d3633; opacity: 0; transform: translateY(16px); transition: opacity .25s ease, transform .25s ease; }
+.aa-painel.aberto { opacity: 1; transform: none; }
+.aa-painel h2 { margin: 6px 36px 10px 0; font: 700 23px/1.2 Georgia, "Times New Roman", serif; letter-spacing: -.03em; }
+.aa-painel h2:focus { outline: none; }
+.aa-painel p { margin: 0 0 10px; color: #2c4650; font-size: 14.5px; line-height: 1.55; }
+.aa-painel .aa-acoes { margin-top: 14px; }
+.aa-pedido .aa-acoes { flex-direction: column; align-items: stretch; gap: 8px; }
+.aa-selo { display: inline-block; color: var(--green); font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.aa-fechar { position: absolute; top: 10px; right: 10px; width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 26px; line-height: 1; }
+.aa-fechar:hover { background: #f0f3e9; }
+.aa-dispensar { display: block; min-height: 36px; margin: 8px auto 0; border: 0; background: none; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.aa-toast { position: fixed; z-index: 70; left: 50%; bottom: 24px; max-width: calc(100vw - 32px); padding: 12px 18px; border-radius: 10px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; opacity: 0; transform: translate(-50%, 20px); pointer-events: none; transition: opacity .25s, transform .25s; }
+.aa-toast.visivel { opacity: 1; transform: translate(-50%, 0); }
+.aa-flutuante { display: none; }
+
+@media (max-width: 800px) {
+  .aa-compartilhar { margin: 0 0 22px; padding: 16px; }
+  .aa-compartilhar .aa-acoes { width: 100%; }
+  .aa-compartilhar .aa-btn { flex: 1 1 auto; }
+  .aa-painel { left: 12px; right: 12px; bottom: 12px; width: auto; max-height: min(80vh, calc(100vh - 24px)); padding: 18px 18px 12px; }
+  .aa-painel h2 { font-size: 21px; }
+  .aa-painel p { font-size: 14px; }
+  /* Botão compacto: some quando estaria sobre o mapa ou o placar (ver apoio.js). */
+  .aa-flutuante { position: fixed; z-index: 50; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 10px 16px; border: 0; border-radius: 999px; background: var(--green); color: #fff; font-size: 13px; font-weight: 700; box-shadow: 0 8px 22px #102d3640; transition: opacity .2s, transform .2s; }
+  .aa-flutuante svg { width: 18px; height: 18px; }
+  .aa-flutuante.oculto { opacity: 0; transform: translateY(12px); pointer-events: none; }
+}
+@media (prefers-reduced-motion: reduce) { .aa-painel, .aa-toast, .aa-flutuante, .aa-btn { transition: none; } }
