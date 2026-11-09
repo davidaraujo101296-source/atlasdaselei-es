@@ -1,0 +1,15 @@
+{
+  "name": "comanda-facil",
+  "version": "1.0.0",
+  "description": "Sistema simples de pedidos, fiado e vendas para bar e restaurante, com impressão na cozinha.",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "agente": "node agente-impressao.js",
+    "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

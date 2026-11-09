@@ -1,0 +1,11 @@
+services:
+  comanda:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - dados:/dados
+
+volumes:
+  dados:

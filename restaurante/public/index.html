@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Comanda Fácil</title>
+  <meta name="theme-color" content="#1f6f43">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icone.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icone.svg">
+  <script>
+    // Aplica o tamanho de letra guardado antes de desenhar a tela (evita "pulo").
+    (function () {
+      var tamanhos = [16, 19, 22, 26, 30];
+      var n = 2;
+      try { var g = parseInt(localStorage.getItem('tamanhoLetra'), 10); if (g >= 0 && g < tamanhos.length) n = g; } catch (e) {}
+      document.documentElement.style.fontSize = tamanhos[n] + 'px';
+    })();
+  </script>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="topo">
+    <button id="voltar" class="voltar" type="button" hidden>‹ Voltar</button>
+    <h1 id="titulo">Comanda Fácil</h1>
+    <div class="letra" role="group" aria-label="Tamanho da letra">
+      <button id="letra-menos" type="button" aria-label="Letra menor">A<small>−</small></button>
+      <button id="letra-mais" type="button" aria-label="Letra maior">A<small>+</small></button>
+    </div>
+  </header>
+  <main id="tela" tabindex="-1"></main>
+  <div id="aviso" role="status" aria-live="polite"></div>
+  <div id="modal" class="fundo-modal" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
